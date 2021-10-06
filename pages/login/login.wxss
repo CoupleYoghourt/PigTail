@@ -1,0 +1,84 @@
+/* pages/login/login.wxss */
+page {
+    background-color: #FCC9C9;
+}
+
+/* 猪头样式 */
+.zhutou {
+    display: flex;
+    justify-content: center;
+}
+
+.zhutou image {
+    margin-top: 50rpx;
+    
+    width: 300rpx;
+    height: 300rpx;
+}
+
+/* 帐号输入框 */
+.ID_input {
+    width: 80%;
+
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 10rpx;
+
+    border: 4rpx solid #437dd4;
+    border-radius: 30rpx;
+    background-color: white;
+}
+
+.ID_input input {
+    width: 80%;
+    height: 100rpx;
+
+    margin-left: 30rpx;
+
+    font-size: 34rpx;
+}
+
+/* 密码输入框 */
+.PWD_input {
+    width: 80%;
+
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 70rpx;
+
+    border: 4rpx solid #437dd4;
+    border-radius: 30rpx;
+    background-color: white;
+}
+
+.PWD_input input {
+    width: 80%;
+    height: 100rpx;
+
+    margin-left: 30rpx;
+    
+    font-size: 34rpx;
+}
+
+/* 登录按钮 */
+.login{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 80%;
+    height: 120rpx;
+
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 80rpx;
+
+    border-radius: 30rpx;
+    border: 4rpx solid #13CF93;
+    background-color: #13CF93;
+}
+
+.login view{
+    color: white;
+    font-size: 40rpx;
+}

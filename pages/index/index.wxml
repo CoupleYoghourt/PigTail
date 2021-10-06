@@ -1,0 +1,37 @@
+<!--index.wxml-->
+
+<!-- 猪头 -->
+<view class="zhutou">
+    <image 
+    mode="widthFix"
+    src="http://m.qpic.cn/psc?/V50dSZpK1h4Nwc2AdR451VLd1I2gOAk7/45NBuzDIW489QBoVep5mcVVHpluV5UVHTea8qkBQU69GG55fN0hHTMTPkPigPNRyAxjt4VJ90v5*iwzdOhO3euP6AjcCnwa9KLVk.uCPa8Y!/b&bo=9AH0AQAAAAADJwI!&rf=viewer_4" />
+</view>
+
+<!-- 在线对战 -->
+<view class="zxdz" bindtap="handleZX">
+    <image 
+    mode="widthFix"
+    src="/icon/index/zxdz.png" />
+    <view>在线对战</view>
+</view>
+
+<!-- 人人对战 -->
+<view class="rrdz" bindtap="handleRR">
+    <image 
+    mode="widthFix"
+    src="/icon/index/rrdz.png" />
+    <view>人人对战</view>
+</view>
+
+<!-- 人机对战 -->
+<view class="rjdz" bindtap="handleRJ">
+    <image 
+    mode="widthFix"
+    src="/icon/index/rjdz.png" />
+    <view>人机对战</view>
+</view>
+
+
+
+
+
