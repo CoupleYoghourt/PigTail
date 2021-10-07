@@ -1,2 +1,41 @@
-<!--pages/roomlist/roomlist.wxml-->
-<text>pages/roomlist/roomlist.wxml</text>
+<!-- 对局列表 -->
+
+<view class="first-line">
+  <view class="create" bindtap="createGame">
+  <image src="../../icon/roomllist/home.png" mode="widthFix"></image>
+  <view>创建对局</view>
+</view>
+
+  <view class="search" bindtap="showDailog">
+    <image src="../../icon/roomllist/search.png" mode="widthFix"></image>
+    <view>搜索对局</view>
+  </view>
+</view>
+<!-- 创建对局 -->
+
+
+<van-dialog use-slot show="{{show}}" show-cancel-button confirmButtonText="加入" bind:close="onClose" bind:confirm="onConfirm">
+  <view>
+    <input type="text" placeholder="请输入对局uuid" bindinput="inputUid" value="{{inputUuid}}">
+    </input>
+  </view>
+</van-dialog>
+
+<view class="area-line" wx:for="{{uuidList}}" wx:for-index="idx" wx:for-item="item" wx:key="item">
+  <image src="../../icon/roomllist/pc.png" mode="widthFix"></image>
+  <view class="uidItem">
+    <text class="uidName">uuid</text>
+    <text class="uidValue">{{item}}</text>
+  </view>
+  <button bindtap="joinGame" data-uuid="{{item}}">加入对局</button>
+</view>
+
+<view class="last-line">
+  <button class="prev" bindtap="goPrev">上一页</button>
+  <view class="pages">
+    <view class="cur">{{curPage}}</view>
+    <view class="max">/{{maxPage}}</view>
+  </view>
+  <button class="next" bindtap="goNext">下一页</button>
+</view>
+

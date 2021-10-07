@@ -3,8 +3,7 @@ Page({
 
     data: {
         id:"",                                  //学号
-        pwd:"",                                 //密码
-        token:"",                               //发送请求后返回的token
+        pwd:""                                 //密码
     },
 
     onLoad: function (options) {
@@ -33,11 +32,11 @@ Page({
     handleLogin: function (e) {
         var that = this;
         var util = require( '../../utils/util.js' );        //导入json转form表单的工具
-
+        var app = getApp()
         //发送请求
         wx.request({
           url: 'http://172.17.173.97:8080/api/user/login',
-          data: util.json2Form( { student_id: this.data.id, password: this.data.pwd }),
+          data: util.json2Form( { student_id: that.data.id, password: that.data.pwd }),
           header: {
             "Content-Type": "application/x-www-form-urlencoded"
           },
@@ -48,10 +47,8 @@ Page({
 
             //用户名密码正确
             if (status === 200) {
-                const token = res.data.data.token;          //获取token
-                that.setData({
-                    token: token
-                })
+                const res_token = res.data.data.token;          //获取token
+                app.globalData.token = res_token
                 //进行页面跳转
                 wx.navigateTo({
                     url: '../roomlist/roomlist?type=1'      //传递对局类型为1

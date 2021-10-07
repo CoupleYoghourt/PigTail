@@ -1,1 +1,138 @@
 /* pages/roomlist/roomlist.wxss */
+page {
+  background-color: #FCC9C9;
+}
+.first-line {
+  display: flex;
+}
+.create {
+  margin-top: 55rpx;
+  margin-left: 80rpx;
+  width: 200rpx;
+  height: 82rpx;
+  border-radius: 20rpx;
+  background-color:  rgba(208, 243, 251, 100);
+  color: rgba(16, 16, 16, 100);
+  font-size: 28rpx;
+  font-family: Arial, Helvetica, sans-serif;
+  border: 2rpx solid rgba(187, 187, 187, 100);
+}
+.create image {
+  width: 50rpx;
+  padding-left: 18rpx;
+  padding-top: 14rpx;
+}
+
+.create view {
+  width: 120rpx;
+  height: 40rpx;
+  float: right;
+  margin-top: 20rpx;
+  margin-right: 4rpx;
+}
+
+.search {
+  margin-top: 55rpx;
+  margin-left: 160rpx;
+  width: 200rpx;
+  height: 82rpx;
+  border-radius: 20rpx;
+  background-color:  rgba(160, 242, 196, 100);
+  color:rgba(16, 16, 16, 100);
+  font-size: 28rpx;
+  font-family: Arial, Helvetica, sans-serif;
+  border: 2rpx solid rgba(187, 187, 187, 100);
+}
+.search image {
+  width: 50rpx;
+  padding-left: 18rpx;
+  padding-top: 14rpx;
+}
+.search view {
+  width: 120rpx;
+  height: 40rpx;
+  float: right;
+  margin-top: 20rpx;
+  margin-right: 4rpx;
+}
+
+
+van-dialog view {
+  margin-top: 50rpx;
+  margin-bottom: 50rpx;
+  font-size: 28rpx;
+  text-align: center;
+}
+
+.area-line {
+  display: flex;
+  width: 620rpx;
+  height: 160rpx;
+  background-color:rgba(255, 255, 255, 100);
+  margin-top: 50rpx;
+  margin-left: 64rpx;
+  border-radius: 16rpx;
+}
+
+.area-line image {
+  width: 70rpx;
+  padding-left: 36rpx;
+  padding-top: 40rpx;
+}
+
+.uidItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.uidName {
+  margin-top: 26rpx;
+  margin-left: 10rpx;
+}
+.uidValue {
+  margin-left: 10rpx;
+}
+.area-line button {
+  margin-top: 46rpx;
+  margin-right: 64rpx;
+  width: 160rpx;
+  height: 60rpx;
+  border-radius: 10rpx;
+  background-color: rgba(126, 149, 232, 100);
+  color: rgba(255, 255, 255, 100);
+  font-size: 24rpx;
+  text-align: center;
+}
+
+.last-line {
+  display: flex;
+  width: 464rpx;
+  height: 64rpx;
+  margin-left: 136rpx;
+  margin-top: 80rpx;
+}
+
+.last-line button {
+    text-align: center;
+    height: 64rpx;
+    width: 120rpx;
+    background-color:#FFFFFF 100%e;
+    line-height: 64rpx;
+    font-size: 20rpx;
+}
+.prev {
+  margin-left: 0;
+}
+.next {
+  margin-right: 0;
+}
+.pages {
+  display: flex;
+  height: 64rpx;
+  line-height: 64rpx;
+  font-size: 20rpx;
+}
+
+.cur {
+  color:#0088A8;
+}
