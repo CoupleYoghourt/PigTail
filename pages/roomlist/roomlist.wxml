@@ -1,35 +1,40 @@
-<!-- 对局列表 -->
 
 <view class="first-line">
-  <view class="create" bindtap="createGame">
-  <image src="../../icon/roomllist/home.png" mode="widthFix"></image>
-  <view>创建对局</view>
-</view>
 
+  <!-- 创建对局 框 -->
+  <view class="create" bindtap="createGame">
+    <image src="../../icon/roomllist/home_grey.png" mode="widthFix"></image>
+    <view>创建对局</view>
+  </view>
+
+  <!-- 搜索对局 框 -->
   <view class="search" bindtap="showDailog">
-    <image src="../../icon/roomllist/search.png" mode="widthFix"></image>
+    <image src="../../icon/roomllist/search_grey.png" mode="widthFix"></image>
     <view>搜索对局</view>
   </view>
+
 </view>
-<!-- 创建对局 -->
 
-
-<van-dialog use-slot show="{{show}}" show-cancel-button confirmButtonText="加入" bind:close="onClose" bind:confirm="onConfirm">
+<!-- 搜索对局点击后的弹出框 -->
+<van-dialog use-slot show="{{show}}" show-cancel-button confirmButtonText="加入" bind:close="onClose"
+  bind:confirm="onConfirm">
   <view>
-    <input type="text" placeholder="请输入对局uuid" bindinput="inputUid" value="{{inputUuid}}">
+    <input type="text" placeholder="请输入对局uuid..." bindinput="inputUid" value="{{inputUuid}}">
     </input>
   </view>
 </van-dialog>
 
+<!-- 对局列表 -->
 <view class="area-line" wx:for="{{uuidList}}" wx:for-index="idx" wx:for-item="item" wx:key="item">
-  <image src="../../icon/roomllist/pc.png" mode="widthFix"></image>
+  <image src="../../icon/roomllist/pc_red.png" mode="widthFix"></image>
   <view class="uidItem">
     <text class="uidName">uuid</text>
-    <text class="uidValue">{{item}}</text>
+    <rich-text class="uidValue">{{item}}</rich-text>
   </view>
   <button bindtap="joinGame" data-uuid="{{item}}">加入对局</button>
 </view>
 
+<!-- 最后一行 -->
 <view class="last-line">
   <button class="prev" bindtap="goPrev">上一页</button>
   <view class="pages">
@@ -38,4 +43,3 @@
   </view>
   <button class="next" bindtap="goNext">下一页</button>
 </view>
-

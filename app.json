@@ -1,19 +1,22 @@
 {
-  "pages":[
-    "pages/index/index",
-    "pages/login/login",
-    "pages/roomlist/roomlist",
-    "pages/game/game"
-  ],
-  "window":{
-    "backgroundTextStyle":"light",
-    "navigationBarBackgroundColor": "#F99D9D",
-    "navigationBarTitleText": "猪尾巴",
-    "navigationBarTextStyle":"black"
-  },
-  "sitemapLocation": "sitemap.json",
-  "usingComponents": {
-    "van-button": "@vant/weapp/button/index",
-    "van-dialog": "@vant/weapp/dialog/index"
-  }
+    "pages": [
+        "pages/index/index",
+        "pages/game/game",
+        "pages/roomlist/roomlist",
+        "pages/login/login",
+        "pages/gameRJ/gameRJ",
+        "pages/gameRR/gameRR",
+        "pages/gameZX/gameZX"
+    ],
+    "window": {
+        "backgroundTextStyle": "light",
+        "navigationBarBackgroundColor": "#F99D9D",
+        "navigationBarTitleText": "猪尾巴",
+        "navigationBarTextStyle": "black"
+    },
+    "sitemapLocation": "sitemap.json",
+    "usingComponents": {
+        "van-button": "@vant/weapp/button/index",
+        "van-dialog": "@vant/weapp/dialog/index"
+    }
 }

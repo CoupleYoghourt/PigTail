@@ -37,15 +37,21 @@
 <!-- 公共区 开始 -->
 <view class="public">
     <view class="round">
-        <text>己方回合</text>
+        <text>{{msg}}</text>
     </view>
 
     <view class="publicArea covered">
-        <text>牌组区</text>
+        <image 
+        src="http://m.qpic.cn/psc?/V50dSZpK1h4Nwc2AdR451VLd1I2gOAk7/45NBuzDIW489QBoVep5mcXrmoHzEzR5xQzfob7GoTzUdhOupCT.TISdj6QiHzlSjXA2aplzbJlE35OsIaQAov7jhKqC0VUseu8*l2NGSb3I!/b&bo=igLPAwAAAAABF3Q!&rf=viewer_4"
+        mode="aspectFill"/>
     </view>
 
     <view class="publicArea uncovered">
-        <text>放置区</text>
+        <text wx:if="{{!placeTop_show}}">放置区</text>
+        <image 
+        wx:if="{{placeTop_show}}"
+        src="{{placeTop_show}}"
+        mode="widthFix"/>
     </view>
 </view>
 <!-- 公共区 结束 -->
@@ -54,9 +60,11 @@
 <!-- 按钮区 开始 -->
 <view class="threeButtons">
     <button  class="button_mo"
+    hidden="{{buttonNotActive}}"
     bindtap="handleMo">摸牌</button>
 
-    <button class="button_chu" 
+    <button class="button_chu"
+    hidden="{{buttonNotActive}}" 
     bindtap="handleChu">出牌</button>
 
     <button class="button_tuo" 
@@ -81,7 +89,9 @@
         <image 
         wx:if="{{item}}"
         src="{{item}}"
-        mode="widthFix"/>
+        mode="widthFix"
+        bindtap="handleChu"
+        data-cardtype="{{index}}"/>
     </view>
 </view>
 <!-- 己方区 结束 -->

@@ -3,7 +3,7 @@ Page({
 
     data: {
         id:"",                                  //学号
-        pwd:""                                 //密码
+        pwd:""                                  //密码
     },
 
     onLoad: function (options) {

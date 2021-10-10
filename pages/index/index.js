@@ -10,21 +10,21 @@ Page({
   //处理在线对战页面跳转
   handleZX: function(e) {
     wx.navigateTo({
-        url: '../login/login'         //登录完后，传递类型为1
+        url: '../login/login'        
     })
   },
 
   //处理人人对战页面跳转
   handleRR: function(e) {
     wx.navigateTo({
-        url: '../game/game?type=2'    //传递类型为2
+        url: '../gameRR/gameRR'   
     })
   },
 
   //处理人机对战页面跳转
   handleRJ: function(e) {
     wx.navigateTo({
-        url: '../game/game?type=3'    //传递类型为3
+        url: '../gameRJ/gameRJ'    
     })
   }
 })

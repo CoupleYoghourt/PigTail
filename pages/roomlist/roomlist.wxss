@@ -2,24 +2,26 @@
 page {
   background-color: #FCC9C9;
 }
+
+/* 第一行 */
 .first-line {
   display: flex;
 }
+/* 创建对局字样 */
 .create {
-  margin-top: 55rpx;
-  margin-left: 80rpx;
+  margin-top: 50rpx;
+  margin-left: 95rpx;
   width: 200rpx;
-  height: 82rpx;
+  height: 80rpx;
   border-radius: 20rpx;
   background-color:  rgba(208, 243, 251, 100);
   color: rgba(16, 16, 16, 100);
-  font-size: 28rpx;
-  font-family: Arial, Helvetica, sans-serif;
+  
   border: 2rpx solid rgba(187, 187, 187, 100);
 }
 .create image {
   width: 50rpx;
-  padding-left: 18rpx;
+  padding-left: 10rpx;
   padding-top: 14rpx;
 }
 
@@ -28,24 +30,28 @@ page {
   height: 40rpx;
   float: right;
   margin-top: 20rpx;
-  margin-right: 4rpx;
+  margin-right: 10rpx;
+  font-size: 30rpx;
+  font-family: PingFang SC;
 }
 
+/* 搜索对局字样 */
 .search {
-  margin-top: 55rpx;
-  margin-left: 160rpx;
+  margin-top: 50rpx;
+  margin-left: 150rpx;
+
   width: 200rpx;
-  height: 82rpx;
+  height: 80rpx;
+
   border-radius: 20rpx;
   background-color:  rgba(160, 242, 196, 100);
   color:rgba(16, 16, 16, 100);
-  font-size: 28rpx;
-  font-family: Arial, Helvetica, sans-serif;
+
   border: 2rpx solid rgba(187, 187, 187, 100);
 }
 .search image {
   width: 50rpx;
-  padding-left: 18rpx;
+  padding-left: 10rpx;
   padding-top: 14rpx;
 }
 .search view {
@@ -53,7 +59,10 @@ page {
   height: 40rpx;
   float: right;
   margin-top: 20rpx;
-  margin-right: 4rpx;
+  margin-right: 15rpx;
+
+  font-size: 30rpx;
+  font-family: PingFang SC;
 }
 
 
@@ -75,9 +84,9 @@ van-dialog view {
 }
 
 .area-line image {
-  width: 70rpx;
+  width: 100rpx;
   padding-left: 36rpx;
-  padding-top: 40rpx;
+  padding-top: 30rpx;
 }
 
 .uidItem {
@@ -90,20 +99,28 @@ van-dialog view {
   margin-left: 10rpx;
 }
 .uidValue {
+  height: 100rpx;
+  width: 165rpx;
   margin-left: 10rpx;
+  word-wrap:break-word;
+  color: #8E8E93;
+  font-size: 28rpx;
 }
+
 .area-line button {
-  margin-top: 46rpx;
-  margin-right: 64rpx;
-  width: 160rpx;
-  height: 60rpx;
+  margin-top: 40rpx;
+  margin-right: 35rpx;
+  width: 180rpx;
+  height: 80rpx;
   border-radius: 10rpx;
   background-color: rgba(126, 149, 232, 100);
   color: rgba(255, 255, 255, 100);
-  font-size: 24rpx;
+  font-size: 31rpx;
   text-align: center;
 }
 
+
+/* 最后一行 */
 .last-line {
   display: flex;
   width: 464rpx;
@@ -115,10 +132,10 @@ van-dialog view {
 .last-line button {
     text-align: center;
     height: 64rpx;
-    width: 120rpx;
+    width: 150rpx;
     background-color:#FFFFFF 100%e;
     line-height: 64rpx;
-    font-size: 20rpx;
+    font-size: 30rpx;
 }
 .prev {
   margin-left: 0;
@@ -134,5 +151,10 @@ van-dialog view {
 }
 
 .cur {
+  font-size: 28rpx;
   color:#0088A8;
+}
+
+.max {
+  font-size: 28rpx;
 }

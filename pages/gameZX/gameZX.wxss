@@ -76,9 +76,17 @@ page{
 .public .covered{
     border: 5rpx solid #F47A7A;
 }
+.public .covered image{
+    width: 100%;
+    height: 100%;
+}
 .public .uncovered{
     margin-left: 50rpx;
     border: 5rpx solid #88B998;
+}
+.public .uncovered image{
+    width: 100%;
+    height: 100%;
 }
 
 
