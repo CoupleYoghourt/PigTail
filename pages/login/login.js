@@ -48,10 +48,13 @@ Page({
             //用户名密码正确
             if (status === 200) {
                 const res_token = res.data.data.token;          //获取token
+
+                console.log(res_token)
+
                 app.globalData.token = res_token
                 //进行页面跳转
                 wx.navigateTo({
-                    url: '../roomlist/roomlist?type=1'      //传递对局类型为1
+                    url: '../roomlist/roomlist?token=' + res_token      
                 })
             }   
             //用户名密码不正确，暂时先这样写，以后可能要设置一个弹框之类的

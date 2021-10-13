@@ -25,6 +25,13 @@ page{
     display: flex;
     flex-direction: row;
 }
+
+.enemy .enemyCardCount{
+    height: 100rpx;
+    /* width: 20rpx; */
+    word-wrap:break-word;
+}
+
 .enemy .enemy_avatar{
     margin: 10rpx 50rpx;
     width: 85rpx;

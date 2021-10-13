@@ -13,6 +13,10 @@
 <view class="outer">
 <!-- 对方区 开始 -->
 <view class="enemy">
+    <view class="enemyCardCount">
+
+    
+    </view>
     <!-- 对方头像 -->
     <image class="enemy_avatar"
     src="../../icon/game/ori_avatar.png"
@@ -61,11 +65,11 @@
 <view class="threeButtons">
     <button  class="button_mo"
     hidden="{{buttonNotActive}}"
-    bindtap="handleMo">摸牌</button>
+    bindtap="handleSelfMo">摸牌</button>
 
     <button class="button_chu"
     hidden="{{buttonNotActive}}" 
-    bindtap="handleChu">出牌</button>
+    bindtap="handleSelfChu">出牌</button>
 
     <button class="button_tuo" 
     bindtap="handleTuo">托管</button>
@@ -90,7 +94,7 @@
         wx:if="{{item}}"
         src="{{item}}"
         mode="widthFix"
-        bindtap="handleChu"
+        bindtap="handleSelfChu"
         data-cardtype="{{index}}"/>
     </view>
 </view>
