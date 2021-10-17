@@ -62,16 +62,24 @@ page{
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding-left: 68rpx;
+    
     margin-top: 7rpx;
     margin-bottom: 10rpx;
 }
+.uuid {
+    width:50rpx;
+    margin-left: 30rpx; 
+    font-size: 16rpx;
+    word-wrap:break-word;
+    color: #000;
+    background-color: #CDDF7E;
+  }
 .public .round{
     display: flex;
     justify-content: center;
     align-items: center;
 
-    margin-left: 45rpx;
+    margin-left: 35rpx;
     margin-right: 172rpx;
     height:35rpx;
     width: 90rpx;

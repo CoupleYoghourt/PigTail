@@ -27,9 +27,9 @@ Page({
 
     //创建对局 并 加入对局
     createGame: function (e) {
-        let token = app.globalData.token
-        //let token = this.data.token
-        let that = this
+        //let token = app.globalData.token
+        let token = this.data.token;
+        let that = this;
         wx.request({
           url: 'http://172.17.173.97:9000/api/game',
           header: {

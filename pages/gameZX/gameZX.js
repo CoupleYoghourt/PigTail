@@ -34,11 +34,13 @@ Page({
         thisTurnDone: false,                    //本回合是否结束
         isMyTurn: false,                        //是否己方回合，人人对战和人机对战默认己方先手
         isEnemyTurn: false,                     //是否对方回合
+        lastEnemyDone: false,                   //对手上一回合的操作做完了
         buttonNotActive: true,                  //三个按钮是否 不 激活
         msg:"尚未开始",                          //提示到谁的回合了
         tuoguan:false,                          //是否在托管状态
         maskFlag:false,                         //托管时的遮罩标志
 
+        interval:0,
         resCard:"",
         
         token:"",
@@ -50,6 +52,12 @@ Page({
             if(newValue){                       //thisTurnDone为true，本回合结束
                 this.data.thisTurnDone = false;                     //开启下一回合
                 this.startGame(this.data.uuid, this.data.token);    //开启下一回合
+            }
+        },
+        tuoguan: function(newValue,oldValue){
+            if(newValue){
+                clearInterval(this.data.interval);
+                this.startGame(this.data.uuid, this.data.token);   
             }
         }
     },
@@ -66,12 +74,59 @@ Page({
     },
 
     startGame: function (uuid, token){
+        //this.isEnd(uuid, token);
         this.getLastInfo(uuid, token);                      //获取对局是否开始
     },
 
+    //判断游戏是否结束
+    // isEnd: function (uuid, token){
+    //     let that = this;
+    //     wx.request({
+    //         url: 'http://172.17.173.97:9000/api/game/' + uuid ,
+    //         header: {
+    //           "Authorization": token,
+    //         },
+    //         method: "get",
+    //         success(res) {
+    //             console.log(res.data)
+    //             if(res === 200){
+    //                 that.endGame();                          //结束游戏
+    //             }
+    //         }
+    //     })
+    // },
+
+    //游戏结束，提示胜方，进行页面跳转
+    endGame: function(){
+        let token = this.data.token;
+        let win;                            
+        let selfTotal = 0;
+        let enemyTotal = 0;
+        for(let i = 0; i < 4 ; i++){
+            selfTotal = selfTotal + this.data.selfCnt[i];
+            enemyTotal =  enemyTotal + this.data.enemyCnt[i];
+        }
+        if(selfTotal == enemyTotal) win = "平局";
+        else win = selfTotal < enemyTotal ? "己方获胜" : "对方获胜" ;
+
+        wx.showModal({
+            title: '提示',
+            content: '游戏结束，' + win + '，即将退出房间...',
+            showCancel: false,
+            success (res) {
+                if (res.confirm) {
+                    wx.reLaunch({
+                        url: '../roomlist/roomlist?token=' + token
+                    })
+                }
+            }
+        })
+    },
+
+    //获取上步操作
     getLastInfo: function (uuid, token){
         let that = this;
-        let interval = setInterval(function () {
+        this.data.interval = setInterval(function () {
             wx.request({
                 url: 'http://172.17.173.97:9000/api/game/' + uuid + '/last',
                 header: {"Authorization":token},
@@ -94,13 +149,16 @@ Page({
                             let pType = last_code.split(' ')[1];        //获得对手的操作类型：摸牌还是出牌
                             let card = last_code.split(' ')[2];         //获得对手出的手牌
 
-                            if(pType == "0"){                           //对手操作为 摸牌
-                                that.handleEnemyMo(card);
-                                console.log("对手上回合摸了！！！" + card)
-                            }
-                            else{                                       //对手操作为 出牌
-                                that.handleEnemyChu(card);
-                                console.log("对手上回合出了！！！" + card)
+                            if(!that.data.lastEnemyDone){                         //上一回合对手操作没在本地完成
+                                if(pType == "0"){                           //对手操作为 摸牌
+                                    that.handleEnemyMo(card);
+                                    console.log("对手上回合摸了！！！" + card);
+                                }
+                                else{                                       //对手操作为 出牌
+                                    that.handleEnemyChu(card);
+                                    console.log("对手上回合出了！！！" + card);
+                                }
+                                that.data.lastEnemyDone = true;             //对手上回合操作在本地执行完了
                             }
                         }
                         that.setData({                                  //等前面都结束后，再打开按钮
@@ -109,7 +167,12 @@ Page({
                             buttonNotActive: false,
                             msg: "己方回合"
                         }); 
-                        clearInterval(interval);                        //关闭计时器，直到本次己方操作结束
+
+                        clearInterval(that.data.interval);                        //关闭计时器，直到本次己方操作结束
+                        
+                        if(that.data.tuoguan){          //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!等待写托管逻辑
+                            that.handleSelfMo();
+                        }
                     }  
                     else{                                       /* 对方回合 */ 
                         that.setData({
@@ -120,6 +183,14 @@ Page({
                         });  
                     }             
                   }
+                  
+                  if(code === 400){
+                      let msg = info.data.err_msg;
+                      if(msg == "对局已结束"){
+                          that.endGame();
+                          clearInterval(that.data.interval);
+                      }
+                  }
                 }
               })
         }, 1000)    //代表1秒钟发送一次请求
@@ -129,6 +200,7 @@ Page({
     handleSelfMo: function() {
         this.sendSelfMo();
     },
+
     //发送己方摸牌的请求
     sendSelfMo: function() {
         let that = this;
@@ -254,7 +326,8 @@ Page({
         
         if(pNum === 0){
             this.data.thisTurnDone = true;          //己方本回合结束，触发观察者函数
-        }
+            this.data.lastEnemyDone = false;
+        }     
     },
 
     //处理托管

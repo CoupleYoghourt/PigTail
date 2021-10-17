@@ -44,6 +44,8 @@
 
 <!-- 公共区 开始 -->
 <view class="public">
+    <view class="uuid">uuid：{{uuid}}</view>
+
     <view class="round">
         <text>{{msg}}</text>
     </view>
