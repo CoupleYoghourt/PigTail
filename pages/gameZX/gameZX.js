@@ -1,5 +1,7 @@
 // pages/gameRJ/gameRJ.js
 
+//记得try catch一下图片渲染的地方，否则有可能会渲染错误
+//写一个渲染图片的函数，try渲染函数 如果有错误就catch这个函数自己（递归），重新渲染
 const watch = require("../../utils/util.js");               //导入观察者
 
 const app = getApp();
@@ -10,10 +12,12 @@ const H = app.globalData.H;
 
 Page({
     data: {
-        enemy: {cards:[[],[],[],[]]},           //对方手牌 顺序：CDSH
-        enemy_showList:["","","",""],           //对方各花色牌顶（CDSH）
+        enemy: {cards:[[],[],[],[]]},           //对方手牌 顺序：CDSH       元素："C1"
+        enemyCnt: [0,0,0,0],                    //统计对方手牌中各花色数量
+        enemy_showList:["","","",""],           //对方各花色牌顶（CDSH）    元素：图片链接
 
         self: {cards:[[],[],[],[]]},            //己方手牌 顺序：CDSH
+        selfCnt: [0,0,0,0],                     //统计己方手牌中各花色数量
         self_showList:["","","",""],            //己方各花色牌顶（CDSH）
 
         placeArea: {                 
@@ -24,16 +28,16 @@ Page({
                 []                              //H
             ],
         },
-        placeTop_card:"",                       //公共放置区最顶上的牌
+        placeTop_card:"",                       //公共放置区最顶上的牌      如"C1"
         placeTop_show:"",                       //公共放置区最顶上的牌的图片路径
 
         thisTurnDone: false,                    //本回合是否结束
-        isMyTurn: false,                         //是否己方回合，人人对战和人机对战默认己方先手
+        isMyTurn: false,                        //是否己方回合，人人对战和人机对战默认己方先手
         isEnemyTurn: false,                     //是否对方回合
-
         buttonNotActive: true,                  //三个按钮是否 不 激活
-
-        msg:"尚未开始",                           //提示到谁的回合了
+        msg:"尚未开始",                          //提示到谁的回合了
+        tuoguan:false,                          //是否在托管状态
+        maskFlag:false,                         //托管时的遮罩标志
 
         resCard:"",
         
@@ -44,8 +48,8 @@ Page({
     watch: {                                    //观察者：观察 thisTurnDone 变量（本回合是否结束）
         thisTurnDone: function(newValue,oldValue){
             if(newValue){                       //thisTurnDone为true，本回合结束
-                this.data.thisTurnDone = false; //开启下一回合
-                this.startGame(this.data.uuid, this.data.token);                  //开启下一回合
+                this.data.thisTurnDone = false;                     //开启下一回合
+                this.startGame(this.data.uuid, this.data.token);    //开启下一回合
             }
         }
     },
@@ -62,7 +66,7 @@ Page({
     },
 
     startGame: function (uuid, token){
-        this.getLastInfo(uuid, token);                  //获取对局是否开始
+        this.getLastInfo(uuid, token);                      //获取对局是否开始
     },
 
     getLastInfo: function (uuid, token){
@@ -85,17 +89,10 @@ Page({
 
                   if(code === 403)  console.log("人还没齐!!!");
                   else if(code === 200){
-                    if(isMyTurn){                                       /* 己方回合 */ 
-                        that.setData({
-                            isMyTurn: true,
-                            isEnemyTurn: false,
-                            buttonNotActive: false,
-                            msg: "己方回合"
-                        });  
-
+                    if(isMyTurn){                               /* 己方回合 */ 
                         if(last_code != ""){                            //上一回合对方操作不为空（说明不是第一回合）
                             let pType = last_code.split(' ')[1];        //获得对手的操作类型：摸牌还是出牌
-                            let card = last_code.split(' ')[2];         //获得他出的手牌
+                            let card = last_code.split(' ')[2];         //获得对手出的手牌
 
                             if(pType == "0"){                           //对手操作为 摸牌
                                 that.handleEnemyMo(card);
@@ -106,9 +103,15 @@ Page({
                                 console.log("对手上回合出了！！！" + card)
                             }
                         }
+                        that.setData({                                  //等前面都结束后，再打开按钮
+                            isMyTurn: true,
+                            isEnemyTurn: false,
+                            buttonNotActive: false,
+                            msg: "己方回合"
+                        }); 
                         clearInterval(interval);                        //关闭计时器，直到本次己方操作结束
                     }  
-                    else{                                                   /* 对方回合 */ 
+                    else{                                       /* 对方回合 */ 
                         that.setData({
                             isMyTurn: false,
                             isEnemyTurn: true,
@@ -124,14 +127,9 @@ Page({
 
     //处理摸牌
     handleSelfMo: function() {
-        //let card = this.sendSelfMo();
-
-
-        console.log("我进去handleSelfMo啦")
         this.sendSelfMo();
-        console.log("结束啦")
     },
-
+    //发送己方摸牌的请求
     sendSelfMo: function() {
         let that = this;
         let token = app.globalData.token;
@@ -146,60 +144,45 @@ Page({
 
             success(res) {
                 let info = res.data;
-
                 let code = info.code;
-                let last_code = info.data.last_code;
+                let last_code = info.data.last_code;           
 
                 console.log(last_code)
 
-                let card = last_code.split(' ')[2];
-
+                let card = last_code.split(' ')[2];                 //获取卡牌
                 that.data.resCard = card;
-                console.log("我是card！！！！！" + card)
 
+                console.log("本回合己方摸了 " + card)
 
-                let pType = "Mo";                   //当前操作类型为 摸牌
+                let pType = "Mo";                                   //当前操作类型为 摸牌
+                let pNum = 0;                                       //己方回合
+                that.handleEat(card, that.data.self, pNum, pType);  //进入吃牌函数判断是否吃牌
 
-                let pNum = 0;                   //己方回合
-                that.handleEat(card, that.data.self, pNum, pType);     //进入吃牌函数判断是否吃牌
-
-
-                // that.setData({
-                //     resCard: card
-                // })
-                console.log(card)
-                console.log(that.data.resCard)
-                
-                if(code != 200) console.log("操作失败！！！");        
-  
+                if(code != 200) console.log("操作失败！！！");                          //可能要写个弹框或递归
             }
         })
-        //console.log("我是返回回来的card！！！！" + resCard)
-        //return resCard;
     },
 
+    //处理对方摸牌
     handleEnemyMo: function(card) {
         console.log("处理对手上回合的摸牌操作" + card)
-        let pType = "Mo";                   //当前操作类型为 摸牌
-        let pNum = 1;                   //对方回合
-        this.handleEat(card, this.data.enemy, pNum, pType);    //进入吃牌函数判断是否吃牌
+        let pType = "Mo";                                           //当前操作类型为 摸牌
+        let pNum = 1;                                               //对方回合
+        this.handleEat(card, this.data.enemy, pNum, pType);         //进入吃牌函数判断是否吃牌
     },
 
     //处理出牌(暂时设置点击某张牌，就出那张牌)
     handleSelfChu: function(e) {
-        let {cardtype} = e.currentTarget.dataset;   //获取出牌的花色的下标
-        let pType = "Chu";                          //当前操作类型为 出牌
-   
-        let pNum = 0;                           //己方回合
-        let card = this.data.self.cards[cardtype][0];       //获取对应的卡牌
+        let {cardtype} = e.currentTarget.dataset;                   //获取出牌的花色的下标
+        let pType = "Chu";                                          //当前操作类型为 出牌
+        let pNum = 0;                                               //己方回合
+        let card = this.data.self.cards[cardtype][0];               //获取对应的卡牌
 
         this.sendSelfChu(card);
-
-        this.data.self.cards[cardtype].shift();             //将对应卡牌移出自己的手牌区
-
-        this.handleEat(card, this.data.self, pNum, pType);     //进入吃牌函数判断是否吃牌
+        this.data.self.cards[cardtype].shift();                     //将对应卡牌移出自己的手牌区
+        this.handleEat(card, this.data.self, pNum, pType);          //进入吃牌函数判断是否吃牌
     },
-
+    //发送己方出牌请求
     sendSelfChu: function(card) {
         let token = app.globalData.token;
         let dataInfo = { type: 1 , card: card };
@@ -217,20 +200,19 @@ Page({
                     console.log("操作成功！！！");
                 }
                 else{
-                    console.log("操作失败！！！");
+                    console.log("操作失败！！！");                          //可能要写个弹框或递归
                 }
             }
         })
     },
 
-
+    //处理对方出牌操作
     handleEnemyChu: function(card) {
-
-        console.log("这里是对面的出牌card！！！33333" + card)
+        console.log("处理对手上回合的出牌操作" + card)
 
         let CDSH = ['C','D','S','H'];
-        let cardType_str = card[0];   //获取出牌的花色的下标
-        let cardType_index = 0;
+        let cardType_str = card[0];                 //获取出牌的花色的下标
+        let cardType_index;
         for(let i = 0;i < 4; i++){
             if(cardType_str == CDSH[i]){
                 cardType_index = i;
@@ -240,43 +222,55 @@ Page({
 
         console.log("这里是对面的出牌card的下标" + cardType_index)
 
-        let pType = "Chu";                          //当前操作类型为 出牌
-        let pNum = 1;                           //对方回合
+        let pType = "Chu";                                      //当前操作类型为 出牌
+        let pNum = 1;                                           //对方回合
 
-        this.data.enemy.cards[cardType_index].shift();             //将对应卡牌移出对方的手牌区
-        this.handleEat(card, this.data.enemy, pNum, pType);    //进入吃牌函数判断是否吃牌
-        
+        this.data.enemy.cards[cardType_index].shift();          //将对应卡牌移出对方的手牌区
+        this.handleEat(card, this.data.enemy, pNum, pType);     //进入吃牌函数判断是否吃牌  
     },
 
     //处理吃牌
     handleEat: function(card,player,pNum,pType) {
-   
-        //判断 当前卡牌是否和放置区卡牌 花色相同（因为card和placeTop_card都是字符串类型，所以取下标[0]）
-        if(this.data.placeTop_card != "" && card[0] == this.data.placeTop_card[0]){          /* 花色相同 */            
-            for(var i = 0; i < 4 ; i++){ 
+    /* 花色相同 */ 
+        //判断 当前卡牌是否和放置区卡牌 花色相同（因为card和placeTop_card都是字符串类型（如"C1"），所以取下标[0]）
+        if(this.data.placeTop_card != "" && card[0] == this.data.placeTop_card[0]){            
+            this.addCardToPlaceArea(card);         //先把牌放到放置区，否则这张牌在吃牌的过程中，不会被吃掉
+            for(let i = 0; i < 4 ; i++){ 
                 let newCards = this.data.placeArea.cards[i].concat(player.cards[i]);    //合并放置区和玩家的卡组
                 player.cards[i] = newCards;         //更新对应玩家的卡组
 
                 this.data.placeArea.cards[i] = [];  //清空放置区卡组
-                this.setPlaceArea("","");           //清空 放置区顶 视图
             }
+            this.setPlaceArea("","");               //清空 放置区顶 视图
             this.setPlayerShow(player,pNum);        //刷新 玩家卡牌区 视图
         }
-        else{                                               /* 花色不同 */ 
-            this.addCardToPlaceArea(card);          //把牌先放到放置区顶
+    /* 花色不同 */
+        else{                                               
+            this.addCardToPlaceArea(card);          //先把牌先放到放置区顶，再判断是否会有吃牌行为
             if(pType == "Chu"){                     //如果是因 出牌操作 而进入到此
                 this.setPlayerShow(player,pNum);    //那么需要 刷新 玩家卡牌区 视图
             }
         }
         
         if(pNum === 0){
-            this.data.thisTurnDone = true;              //本回合结束，触发观察者函数
+            this.data.thisTurnDone = true;          //己方本回合结束，触发观察者函数
         }
     },
 
     //处理托管
     handleTuo: function() {
-        console.log(123)
+        this.setData({
+            maskFlag: true,
+            tuoguan: true
+        })
+    },
+
+    //处理取消托管
+    handleCancelTuo: function() {
+        this.setData({
+            maskFlag: false,
+            tuoguan: false
+        })
     },
 
     //把牌加到放置区顶
@@ -306,17 +300,18 @@ Page({
         //传入this.data.enemy/self
         let CDSH=[C,D,S,H];
         let list = [];
+        let cnt = [];
         for(var i = 0; i < 4 ; i++){                //更新对应玩家 各花色 最上面的一张牌
-            if (player.cards[i].length != 0)
+            let len = player.cards[i].length;
+            if (len != 0)
                 list.push(CDSH[i][player.cards[i][0]]);          
             else                                    //该玩家没这种花色
                 list.push("");
+            cnt.push(len);
         }
         if(pNum === 0)                              //己方玩家
-            this.setData({self_showList: list});       
+            this.setData({self_showList: list, selfCnt: cnt});       
         else                                        //对方玩家
-            this.setData({enemy_showList: list});  
+            this.setData({enemy_showList: list, enemyCnt: cnt});  
     },
-
-
 })

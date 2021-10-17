@@ -10,9 +10,18 @@
 <!-- 背景图 结束 -->
 
 
+
 <view class="outer">
 <!-- 对方区 开始 -->
 <view class="enemy">
+    <!-- 对方手牌统计 -->   
+    <view class="enemyCardCount">
+    C:{{enemyCnt[0]}}
+    D:{{enemyCnt[1]}}
+    S:{{enemyCnt[2]}}
+    H:{{enemyCnt[3]}}   
+    </view>
+
     <!-- 对方头像 -->
     <image class="enemy_avatar"
     src="../../icon/game/ori_avatar.png"
@@ -75,6 +84,14 @@
 
 <!-- 己方区 开始 -->
 <view class="self">
+    <!-- 己方手牌统计 -->
+    <view class="selfCardCount">
+    C:{{selfCnt[0]}}
+    D:{{selfCnt[1]}}
+    S:{{selfCnt[2]}}
+    H:{{selfCnt[3]}}  
+    </view>
+
     <!-- 己方头像 -->
     <image class="self_avatar"
     src="../../icon/game/ori_avatar.png"
@@ -93,7 +110,16 @@
         bindtap="handleChu"
         data-cardtype="{{index}}"/>
     </view>
+
+    <!-- 托管时的遮罩 -->
+    <view class='mask' hidden='{{!maskFlag}}'></view>
+    <!-- 取消托管  按钮 -->
+    <button class="tuoguan"
+    hidden="{{!tuoguan}}"
+    bindtap="handleCancelTuo">取消托管</button>
 </view>
 <!-- 己方区 结束 -->
 </view>
+
+
 

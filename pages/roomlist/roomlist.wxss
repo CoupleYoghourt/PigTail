@@ -66,13 +66,6 @@ page {
 }
 
 
-van-dialog view {
-  margin-top: 50rpx;
-  margin-bottom: 50rpx;
-  font-size: 28rpx;
-  text-align: center;
-}
-
 .area-line {
   display: flex;
   width: 620rpx;

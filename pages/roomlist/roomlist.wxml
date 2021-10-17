@@ -15,14 +15,6 @@
 
 </view>
 
-<!-- 搜索对局点击后的弹出框 -->
-<van-dialog use-slot show="{{show}}" show-cancel-button confirmButtonText="加入" bind:close="onClose"
-  bind:confirm="onConfirm">
-  <view>
-    <input type="text" placeholder="请输入对局uuid..." bindinput="inputUid" value="{{inputUuid}}">
-    </input>
-  </view>
-</van-dialog>
 
 <!-- 对局列表 -->
 <view class="area-line" wx:for="{{uuidList}}" wx:for-index="idx" wx:for-item="item" wx:key="item">

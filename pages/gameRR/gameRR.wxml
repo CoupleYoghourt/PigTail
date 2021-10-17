@@ -10,9 +10,18 @@
 <!-- 背景图 结束 -->
 
 
+
 <view class="outer">
 <!-- 对方区 开始 -->
 <view class="enemy">
+    <!-- 对方手牌统计 -->   
+    <view class="enemyCardCount">
+    C:{{enemyCnt[0]}}
+    D:{{enemyCnt[1]}}
+    S:{{enemyCnt[2]}}
+    H:{{enemyCnt[3]}}   
+    </view>
+
     <!-- 对方头像 -->
     <image class="enemy_avatar"
     src="../../icon/game/ori_avatar.png"
@@ -28,7 +37,9 @@
         <image 
         wx:if="{{item}}"
         src="{{item}}"
-        mode="widthFix"/>
+        mode="widthFix"
+        bindtap="handleChu"
+        data-cardtype="{{index}}"/>
     </view>
 </view>
 <!-- 对方区 结束 -->
@@ -37,15 +48,21 @@
 <!-- 公共区 开始 -->
 <view class="public">
     <view class="round">
-        <text>己方回合</text>
+        <text>{{msg}}</text>
     </view>
 
     <view class="publicArea covered">
-        <text>牌组区</text>
+        <image 
+        src="http://m.qpic.cn/psc?/V50dSZpK1h4Nwc2AdR451VLd1I2gOAk7/45NBuzDIW489QBoVep5mcXrmoHzEzR5xQzfob7GoTzUdhOupCT.TISdj6QiHzlSjXA2aplzbJlE35OsIaQAov7jhKqC0VUseu8*l2NGSb3I!/b&bo=igLPAwAAAAABF3Q!&rf=viewer_4"
+        mode="aspectFill"/>
     </view>
 
     <view class="publicArea uncovered">
-        <text>放置区</text>
+        <text wx:if="{{!placeTop_show}}">放置区</text>
+        <image 
+        wx:if="{{placeTop_show}}"
+        src="{{placeTop_show}}"
+        mode="widthFix"/>
     </view>
 </view>
 <!-- 公共区 结束 -->
@@ -54,9 +71,11 @@
 <!-- 按钮区 开始 -->
 <view class="threeButtons">
     <button  class="button_mo"
+    hidden="{{buttonNotActive}}"
     bindtap="handleMo">摸牌</button>
 
-    <button class="button_chu" 
+    <button class="button_chu"
+    hidden="{{buttonNotActive}}" 
     bindtap="handleChu">出牌</button>
 
     <button class="button_tuo" 
@@ -67,6 +86,14 @@
 
 <!-- 己方区 开始 -->
 <view class="self">
+    <!-- 己方手牌统计 -->
+    <view class="selfCardCount">
+    C:{{selfCnt[0]}}
+    D:{{selfCnt[1]}}
+    S:{{selfCnt[2]}}
+    H:{{selfCnt[3]}}  
+    </view>
+
     <!-- 己方头像 -->
     <image class="self_avatar"
     src="../../icon/game/ori_avatar.png"
@@ -81,9 +108,20 @@
         <image 
         wx:if="{{item}}"
         src="{{item}}"
-        mode="widthFix"/>
+        mode="widthFix"
+        bindtap="handleChu"
+        data-cardtype="{{index}}"/>
     </view>
+
+    <!-- 托管时的遮罩 -->
+    <view class='mask' hidden='{{!maskFlag}}'></view>
+    <!-- 取消托管  按钮 -->
+    <button class="tuoguan"
+    hidden="{{!tuoguan}}"
+    bindtap="handleCancelTuo">取消托管</button>
 </view>
 <!-- 己方区 结束 -->
 </view>
+
+
 

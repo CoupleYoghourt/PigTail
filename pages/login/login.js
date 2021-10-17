@@ -1,6 +1,5 @@
 // pages/login/login.js
 Page({
-
     data: {
         id:"",                                  //学号
         pwd:""                                  //密码
@@ -44,26 +43,27 @@ Page({
 
           success (res) {
             const status = res.data.status;
-
             //用户名密码正确
             if (status === 200) {
                 const res_token = res.data.data.token;          //获取token
-
                 console.log(res_token)
-
                 app.globalData.token = res_token
                 //进行页面跳转
                 wx.navigateTo({
                     url: '../roomlist/roomlist?token=' + res_token      
                 })
             }   
-            //用户名密码不正确，暂时先这样写，以后可能要设置一个弹框之类的
+            //用户名密码不正确
             else {
                 console.log('用户名密码出错')
+                wx.showModal({
+                  title: '提示',
+                  content: '登录失败，可能由于用户名密码错误或网络延迟...',
+                  showCancel: false,
+                })
             }
           }    
         })
-
 
         // 判断缓存中有没有token 
         //const token = wx.getStorageSync("token");

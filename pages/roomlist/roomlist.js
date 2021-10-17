@@ -1,7 +1,6 @@
 // pages/roomlist/roomlist.js
-import Dialog from '../../miniprogram_npm/@vant/weapp/dialog/dialog';
 
-const app = getApp()
+const app = getApp();
 
 Page({
     data: {
@@ -12,8 +11,6 @@ Page({
           "wu1yrmnbb1hsstse",
           "wu1yrmnbb1hsstse"
         ],
-        inputUuid:"",
-        show:false,
         curPage:1,
         maxPage:10,
 
@@ -21,10 +18,11 @@ Page({
     },
 
     onLoad: function (options) {
-      this.getList({"size":4, "num":1});
       this.setData({
         token: options.token
       })
+      this.getList({"size":4, "num":1});
+      //console.log(this.data.token);
     },
 
     //创建对局 并 加入对局
@@ -46,29 +44,59 @@ Page({
             if (status === 200) {
                 //成功创建对局，获取uuid
                 var uuid = res.data.data.uuid
-
                 console.log("创建的对局uuid为："+uuid)
-
                 that.setData({
                     createUuid: uuid
                 })
-                //that.joinMyGame(uuid);
-                                                          //跳转到对局界面
                 wx.navigateTo({
                   url: '../gameZX/gameZX?uuid=' + uuid +'&token=' + token       
                 })            
             }
             else {
                 console.log("创建失败")
+                wx.showModal({
+                  title: '提示',
+                  content: '创建对局失败',
+                  showCancel: false,
+                })
             }
           }
         })
     },
+    
+    //点击 搜索对局 框后，显示弹出框
+    showDailog: function(e) {
+      let that = this;
+      wx.showModal({  
+        title: '正在加入对局',  
+        editable: true,
+        placeholderText: "请输入对局uuid...",
+        success: function(res) {  
+            if (res.confirm) {  
+              let token = that.data.token;
+              let uuid = res.content;
+              console.log(uuid);
+              that.sendJoinRequest(token,uuid);    //用户点确定加入对局后，发送请求
+            }
+            else if (res.cancel) {  
+              console.log('用户点击取消')  
+            }  
+        }  
+      })
+    },
 
-    joinMyGame: function(uuid) {
-      let token = app.globalData.token;
+    //对局列表中的 加入对局 按钮
+    joinGame: function(e) {
+      let token = this.data.token;
+      let uuid = e.currentTarget.dataset.uuid;
+      this.sendJoinRequest(token, uuid);
+    },
+
+    //发送加入对局请求，并进行页面跳转
+    sendJoinRequest: function(token, uuid){
+      let that = this;
       wx.request({
-        url: 'http://172.17.173.97:9000/api/game/:' + uuid,
+        url: 'http://172.17.173.97:9000/api/game/' + uuid,
         header: {
           "Authorization":token,
           "Content-Type": "application/x-www-form-urlencoded"
@@ -76,78 +104,31 @@ Page({
         method: "post",
 
         success(res) {
-          const status = res.data.code
-          //console.log(status)
-          if (status === 200) {
-              console.log("加入对局成功！！！")
-          }
+          const status = res.data.code;
           console.log(res.data)
-          console.log("加入对局失败！！！")
+          console.log(status)
+          if (status === 200) {
+            console.log("加入对局成功！！！");  
+            wx.navigateTo({
+              url: '../gameZX/gameZX?uuid=' + uuid +'&token=' + token     
+            }) 
+          }  
+          else
+            console.log("加入对局失败！！！");
+            wx.showModal({
+              title: '提示',
+              content: '加入房间失败，可能由于uuid错误或网络延迟...',
+              showCancel: false,
+            })
         }
       })
     },
 
-    /* 搜索对局 */
-    //显示搜索框
-    showDailog: function(e) {
-      this.setData({show:true})
-    },
-
-    //关闭搜索框
-    onClose: function() {
-      this.setData({
-        show:false,
-        inputUuid:""
-      })
-    },
-
-    //搜索框的 输入uuid
-    inputUid: function(e) {
-      //console.log(e)
-      this.setData({
-        inputUuid:e.detail.value
-      })
-    },
-
-    //搜索框的加入 按钮，uuid为inputUuid
-    onConfirm: function(e) {
-      let token = this.data.token
-      var uuid = this.data.inputUuid
-      //console.log(uuid)
-                                                            //没写逻辑？？？
-      wx.navigateTo({
-        url: '../gameZX/gameZX?uuid=' + uuid +'&token=' + token     
-      }) 
-                                                           /////进行页面跳转。。。
-    },
-
-    //正常的 加入对局 按钮，list的
-    joinGame: function(e) {
-      let token = this.data.token
-
-      console.log(123456789123456)
-      console.log(this.data.token)
-      console.log(123456789123456)
-
-      var uuid = e.currentTarget.dataset.uuid
-      //console.log(uuid)
-                                                          //没写逻辑？？
-      wx.navigateTo({
-        url: '../gameZX/gameZX?uuid=' + uuid +'&token=' + token     
-      }) 
-                                                          //跳转到对面界面
-    },
-
     //获取对局列表 传入一个对象page{"size": "num":}
     getList:function(page) {
-      var that = this
-      //let token = this.data.token
-      let token = app.globalData.token
-      // console.log(123456789123456)
-      // console.log(this.data.token)
-      // console.log(123456789123456)
-
-
+      var that = this;
+      let token = this.data.token;
+      //console.log(token);
       wx.request({
         url: 'http://172.17.173.97:9000/api/game/index',
         header: {

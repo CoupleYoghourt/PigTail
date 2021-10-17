@@ -1,12 +1,11 @@
 {
     "pages": [
+        "pages/login/login",
         "pages/gameZX/gameZX",
         "pages/index/index",
-        "pages/game/game",
         "pages/roomlist/roomlist",
-        "pages/login/login",
-        "pages/gameRJ/gameRJ",
-        "pages/gameRR/gameRR"
+        "pages/gameRR/gameRR",
+        "pages/gameRJ/gameRJ"    
     ],
     "window": {
         "backgroundTextStyle": "light",
@@ -16,7 +15,5 @@
     },
     "sitemapLocation": "sitemap.json",
     "usingComponents": {
-        "van-button": "@vant/weapp/button/index",
-        "van-dialog": "@vant/weapp/dialog/index"
     }
 }
