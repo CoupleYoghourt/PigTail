@@ -15,7 +15,7 @@
                 {
                     "name": "测试房间列表",
                     "pathName": "pages/roomlist/roomlist",
-                    "query": "token=eyJhbGciOiJIUzUxMiIsImlhdCI6MTYzNDQ2NDQ5OSwiZXhwIjoxNjM1MzI4NDk5fQ.eyJpZCI6MTEzfQ.EJkX7-gGSWyJgfL4cCUy0QAdJJPRZxJ1J-tTCg-UwcwW2sSQCABZt8e2Dn9LrVRq6Bo4BkCVsswKfld998xucw",
+                    "query": "token=eyJhbGciOiJIUzUxMiIsImlhdCI6MTYzNDQ4MzQzNywiZXhwIjoxNjM1MzQ3NDM3fQ.eyJpZCI6MTEzfQ.DiWmTVhmGJpnOaS6Ciw-XSRHLs2TUFnQrVFWgob6uP4WDGLyhN-fhOCTzm-pJr7CVns5uyhR3xTQ32Q4MRaHfg",
                     "scene": null
                 }
             ]

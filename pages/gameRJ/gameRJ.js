@@ -86,7 +86,7 @@ Page({
 
         if(this.data.isMyTurn){                 //己方回合
             this.setData({buttonNotActive: false});     
-            this.handleMo();    
+            //this.handleMo();    
         }
         else{                                  //人机对战中，机器方回合
             this.sleep(500);                   //睡眠一下，防止过快

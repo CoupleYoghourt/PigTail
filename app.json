@@ -2,10 +2,10 @@
     "pages": [
         "pages/index/index",
         "pages/gameZX/gameZX",
-        "pages/login/login",
-        "pages/roomlist/roomlist",
         "pages/gameRR/gameRR",
-        "pages/gameRJ/gameRJ"    
+        "pages/gameRJ/gameRJ" ,   
+        "pages/login/login",
+        "pages/roomlist/roomlist"
     ],
     "window": {
         "backgroundTextStyle": "light",

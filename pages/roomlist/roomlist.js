@@ -113,13 +113,14 @@ Page({
               url: '../gameZX/gameZX?uuid=' + uuid +'&token=' + token     
             }) 
           }  
-          else
+          else{
             console.log("加入对局失败！！！");
             wx.showModal({
               title: '提示',
               content: '加入房间失败，可能由于uuid错误或网络延迟...',
               showCancel: false,
             })
+          }
         }
       })
     },
@@ -155,7 +156,12 @@ Page({
             })
           }
           else {
-            console.log("获取对局列表失败")
+            console.log("获取对局列表失败");
+            wx.showModal({
+              title: '提示',
+              content: '获取对局列表失败',
+              showCancel: false,
+            })
           }
         }
       })

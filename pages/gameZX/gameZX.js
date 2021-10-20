@@ -54,7 +54,7 @@ Page({
                 this.startGame(this.data.uuid, this.data.token);    //开启下一回合
             }
         },
-        tuoguan: function(newValue,oldValue){
+        tuoguan: function(newValue,oldValue){   //观察是否在托管状态
             if(newValue){
                 clearInterval(this.data.interval);
                 this.startGame(this.data.uuid, this.data.token);   
