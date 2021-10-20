@@ -1,7 +1,7 @@
 // pages/gameRJ/gameRJ.js
 
 const watch = require("../../utils/util.js");               //导入观察者
-
+const mcts = require("../../utils/util.js");                //导入决策函数
 const app = getApp();
 const C = app.globalData.C;
 const D = app.globalData.D;
@@ -90,7 +90,8 @@ Page({
         }
         else{                                  //人机对战中，机器方回合
             this.sleep(500);                   //睡眠一下，防止过快
-            this.handleMo();                                                       //暂时人机设置只摸牌
+            //this.handleMo();                                                       //暂时人机设置只摸牌
+            this.doAI();
             this.setData({msg: "己方回合"});      
         }
     },
@@ -170,7 +171,43 @@ Page({
         }
         this.data.thisTurnDone = true;              //本回合结束，触发观察者函数
     },
-
+     //托管时AI操作
+     doAI: function(){
+        var enemyCnt = this.data.enemyCnt;
+        var selfCnt = this.data.selfCnt;
+        var placeArea = this.data.placeArea.cards; 
+        var placeTop_card = this.data.placeTop_card;
+        //console.log(placeTop_card);
+        //进行决策
+        var num = mcts.Mcts(selfCnt, enemyCnt, placeArea, placeTop_card);
+        //决策出来是0 就调用this.handleMo()
+        console.log(num);
+        if (num == 0) {
+            this.handleMo()
+        }
+        else {
+            this.handleAIChu(num-1)
+        }
+        //决出出来是num 就调用this.handleAIChu(num-1)
+    },
+    
+    //处理托管出牌，传入要出的牌的花色
+    handleAIChu: function(cardtype) {
+        let pType = "Chu";                          //当前操作类型为 出牌
+        //判断是谁的回合
+        if(this.data.isMyTurn){
+            let pNum = 0;                           //己方回合
+            let card = this.data.self.cards[cardtype][0];       //获取对应的卡牌
+            this.data.self.cards[cardtype].shift();             //将对应卡牌移出自己的手牌区
+            this.handleEat(card, this.data.self, pNum, pType);  //进入吃牌函数判断是否吃牌
+        }
+        else{
+            let pNum = 1;                           //对方回合
+            let card = this.data.enemy.cards[cardtype][0];      //获取对应的卡牌
+            this.data.enemy.cards[cardtype].shift();             //将对应卡牌移出自己的手牌区
+            this.handleEat(card, this.data.enemy, pNum, pType); //进入吃牌函数判断是否吃牌
+        }
+    },
     //处理托管
     handleTuo: function() {
         this.setData({

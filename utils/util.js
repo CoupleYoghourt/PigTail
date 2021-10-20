@@ -71,7 +71,7 @@ function observe(obj, key, watchFun, deep, page) {
 //对手手牌状态，己方手牌状态，放置区手牌状态, 放置区牌顶
 //顺序CDSH
 //返回一个值0 摸牌， 1，2，3，4分别表示CDSH
-function Mcts(enemyCnt, selfCnt, placeArea, palceTop_card) {
+function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
   let placeAreaCnt = [0,0,0,0];
   for (var i = 0; i < 4; ++i) {
     placeAreaCnt[i] = placeArea[i].length;
@@ -83,18 +83,30 @@ function Mcts(enemyCnt, selfCnt, placeArea, palceTop_card) {
     leftCard[i] -= selfCnt[i];
     leftCard[i] -= placeAreaCnt[i];
   }
-  var sumSelf = 0, sumLeft = 0;
+  var sumSelf = 0, sumLeft = 0, sumPlace = 0;
   for (var i = 0; i < 4; ++i) {
     sumSelf += selfCnt[i];
     sumLeft += leftCard[i];
+    sumPlace += placeAreaCnt[i];
   }
   //如果没有手牌，那么只能摸牌
   if (sumLeft == 0) {
     return 0;
   }
+  if (placeTop_card == "") {
+    var possilbeSelect = [0];
+    for (var i = 0; i < 4; ++i) {
+      if (selfCnt[i] != 0)
+        possilbeSelect.push(i+1);
+    }
+    possilbeSelect.sort(function(){
+      return Math.random - 0.5;
+    });
+    return possilbeSelect[0];
+  }
   //放置区顶牌对应的下标
   var index = -1;
-  switch(palceTop_card[0]) {
+  switch(placeTop_card[0]) {
     case 'C':
       index = 0;
       break;
@@ -109,7 +121,7 @@ function Mcts(enemyCnt, selfCnt, placeArea, palceTop_card) {
       break;
   }
   //如果牌库剩余牌不大于手牌，则全部操作为出牌
-  if (sumSelf >= sumLeft) {
+  if (sumSelf + sumPlace >= sumLeft) {
     //获得牌堆中与当前放置区不同的牌的数量
     //取最大值，这样对手摸牌的话，吃牌概率最大
     var maxCardCnt = -1, maxIndex = -1;
@@ -129,7 +141,7 @@ function Mcts(enemyCnt, selfCnt, placeArea, palceTop_card) {
     var tmp = leftCard[i];
     while(tmp) {
       tmp--;
-      cardList.append(i);
+      cardList.push(i);
     }
   }
   cardList.sort(function(){
@@ -139,7 +151,7 @@ function Mcts(enemyCnt, selfCnt, placeArea, palceTop_card) {
   var possilbeSelect = [0];
   for (var i = 0; i < 4; ++i) {
     if (selfCnt[i] != 0)
-      possilbeSelect.append(i+1);
+      possilbeSelect.push(i+1);
   }
   possilbeSelect.sort(function(){
     return Math.random - 0.5;
@@ -150,5 +162,6 @@ function Mcts(enemyCnt, selfCnt, placeArea, palceTop_card) {
 module.exports = {
   json2Form:json2Form,
   formatTime,
-  setWatcher: setWatcher
+  setWatcher: setWatcher,
+  Mcts: Mcts
 }
