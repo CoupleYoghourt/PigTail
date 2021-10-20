@@ -100,8 +100,9 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
         possilbeSelect.push(i+1);
     }
     possilbeSelect.sort(function(){
-      return Math.random - 0.5;
+      return Math.random() - 0.5;
     });
+    console.log(possilbeSelect);
     return possilbeSelect[0];
   }
   //放置区顶牌对应的下标
@@ -145,7 +146,7 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
     }
   }
   cardList.sort(function(){
-    return Math.random - 0.5;
+    return Math.random() - 0.5;
   });
   //进行抉择
   var possilbeSelect = [0];
@@ -154,8 +155,10 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
       possilbeSelect.push(i+1);
   }
   possilbeSelect.sort(function(){
-    return Math.random - 0.5;
+    return Math.random() - 0.5;
   });
+  console.log(possilbeSelect);
+
   return possilbeSelect[0];
 }
 
