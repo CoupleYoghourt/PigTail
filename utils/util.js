@@ -132,6 +132,8 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
           maxIndex = i;
         }
     }
+    if (52 - sumSelf - sumPlace - sumLeft <= sumSelf)
+      return 0;
     //出的牌为对应的下标
     return maxIndex + 1;
   }
