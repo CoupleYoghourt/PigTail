@@ -76,8 +76,7 @@
     hidden="{{buttonNotActive}}" 
     bindtap="handleChu">出牌</button>
 
-    <button class="button_tuo" 
-    bindtap="handleTuo">托管</button>
+    <button class="button_tuo"> </button>
 </view>
 <!-- 按钮区 开始 -->
 
@@ -107,7 +106,7 @@
         wx:if="{{item}}"
         src="{{item}}"
         mode="widthFix"
-        bindtap="handleChu"
+        bindtap="handleSelfChu"
         data-cardtype="{{index}}"/>
     </view>
 

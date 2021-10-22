@@ -123,24 +123,32 @@ Page({
         }
     },
 
-    //处理出牌(暂时设置点击某张牌，就出那张牌)
-    handleChu: function(e) {
+    //处理己方出牌(暂时设置点击某张牌，就出那张牌)
+    handleSelfChu: function(e) {
         let {cardtype} = e.currentTarget.dataset;   //获取出牌的花色的下标
         let pType = "Chu";                          //当前操作类型为 出牌
         //判断是谁的回合
         if(this.data.isMyTurn){
             let pNum = 0;                           //己方回合
             let card = this.data.self.cards[cardtype][0];       //获取对应的卡牌
+            console.log("己方出了！！！" + card)
             this.data.self.cards[cardtype].shift();             //将对应卡牌移出自己的手牌区
             this.handleEat(card, this.data.self, pNum, pType);  //进入吃牌函数判断是否吃牌
         }
-        else{
+    },
+
+    //处理对方出牌(暂时设置点击某张牌，就出那张牌)
+    handleEnemyChu: function(e) {
+        let {cardtype} = e.currentTarget.dataset;   //获取出牌的花色的下标
+        let pType = "Chu";                          //当前操作类型为 出牌
+        //判断是谁的回合
+        if(this.data.isEnemyTurn){
             let pNum = 1;                           //对方回合
             let card = this.data.enemy.cards[cardtype][0];      //获取对应的卡牌
-            this.data.enemy.cards[cardtype].shift();             //将对应卡牌移出自己的手牌区
+            console.log("对方出了！！！" + card)
+            this.data.enemy.cards[cardtype].shift();            //将对应卡牌移出自己的手牌区
             this.handleEat(card, this.data.enemy, pNum, pType); //进入吃牌函数判断是否吃牌
         }
-
     },
 
     //处理吃牌
@@ -200,10 +208,15 @@ Page({
 
     //设置 放置区牌顶 显示的内容
     setPlaceArea: function(card,url){
-        this.setData({
-            placeTop_card: card,                //更改放置区顶的牌
-            placeTop_show: url                  //更改放置区顶的牌的图片路径
-        }); 
+        try {
+            this.setData({
+                placeTop_card: card,                //更改放置区顶的牌
+                placeTop_show: url                  //更改放置区顶的牌的图片路径
+            }); 
+        }
+        catch(err) {
+            this.setPlaceArea(card,url);
+        }
     },
 
     //处理每一回合玩家手牌区的显示
@@ -220,10 +233,15 @@ Page({
                 list.push("");
             cnt.push(len);
         }
-        if(pNum === 0)                              //己方玩家
-            this.setData({self_showList: list, selfCnt: cnt});       
-        else                                        //对方玩家
-            this.setData({enemy_showList: list, enemyCnt: cnt});  
+        
+        if(pNum === 0) {                            //己方玩家
+            try {this.setData({self_showList: list, selfCnt: cnt});}
+            catch(err) {this.setData({self_showList: list, selfCnt: cnt});}   
+        }   
+        else {                                      //对方玩家
+            try {this.setData({enemy_showList: list, enemyCnt: cnt}); }
+            catch(err) {this.setData({enemy_showList: list, enemyCnt: cnt}); }
+        }   
     },
 
     /* 人人对战和人机对战时的本地牌库随机化 */ 

@@ -27,7 +27,7 @@ page{
 }
 
 .enemy .enemyCardCount{
-    margin-top: calc(1vw * 100 / 750);
+    margin-top: calc(2vw * 100 / 750);
     margin-left: calc(30vw * 100 / 750);
     height: calc(95vw * 100 / 750);
     width: calc(40vw * 100 / 750); 
@@ -47,7 +47,7 @@ page{
 }
 
 .enemy .enemy_cardsArea{
-    margin-top: calc(1vw * 100 / 750);
+    margin-top: calc(2vw * 100 / 750);
     margin-right: calc(50vw * 100 / 750);
     width: calc(65vw * 100 / 750);
     height: calc(95vw * 100 / 750);
@@ -55,8 +55,8 @@ page{
 }
 
 .enemy .enemy_cardsArea image{
-    width: 100%;
-    height: 100%;
+    width: 98%;
+    height: 98%;
 }
 
 
@@ -131,6 +131,7 @@ page{
     margin-left: calc(185vw * 100 / 750);
 }
 .threeButtons .button_tuo{
+    background-color: rgba(255,255,255,0);
     margin-right: calc(125vw * 100 / 750);
 }
 
@@ -169,8 +170,8 @@ page{
 }
 
 .self .self_cardsArea image{
-    width: 100%;
-    height: 100%;
+    width: 98%;
+    height: 98%;
 }
 
 /* 遮罩的样式 */
