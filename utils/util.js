@@ -83,27 +83,24 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
     leftCard[i] -= selfCnt[i];
     leftCard[i] -= placeAreaCnt[i];
   }
-  var sumSelf = 0, sumLeft = 0, sumPlace = 0;
+  var sumSelf = 0, sumLeft = 0, sumPlace = 0, sumEney = 0;
   for (var i = 0; i < 4; ++i) {
     sumSelf += selfCnt[i];
     sumLeft += leftCard[i];
     sumPlace += placeAreaCnt[i];
+    sumEney += enemyCnt[i];
   }
   //如果没有手牌，那么只能摸牌
   if (sumLeft == 0) {
     return 0;
   }
-  if (placeTop_card == "") {
-    var possilbeSelect = [0];
-    for (var i = 0; i < 4; ++i) {
-      if (selfCnt[i] != 0)
-        possilbeSelect.push(i+1);
-    }
-    possilbeSelect.sort(function(){
-      return Math.random() - 0.5;
-    });
-    console.log(possilbeSelect);
-    return possilbeSelect[0];
+  //摸爆了
+  if (sumSelf + sumEney + sumPlace >= 78) {
+    return 0;
+  }
+  //怎么摸牌都少就一直摸
+  if (sumSelf + sumPlace < 5 || sumSelf + sumSelf + 1 < sumEney) {
+    return 0;
   }
   //放置区顶牌对应的下标
   var index = -1;
@@ -132,8 +129,6 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
           maxIndex = i;
         }
     }
-    if (52 - sumSelf - sumPlace - sumLeft <= sumSelf)
-      return 0;
     //出的牌为对应的下标
     return maxIndex + 1;
   }
@@ -160,7 +155,6 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
     return Math.random() - 0.5;
   });
   console.log(possilbeSelect);
-
   return possilbeSelect[0];
 }
 
