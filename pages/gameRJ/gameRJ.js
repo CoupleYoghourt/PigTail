@@ -2,6 +2,7 @@
 
 const watch = require("../../utils/util.js");               //导入观察者
 const mcts = require("../../utils/util.js");                //导入决策函数
+
 const app = getApp();
 const C = app.globalData.C;
 const D = app.globalData.D;
@@ -90,7 +91,6 @@ Page({
         }
         else{                                  //人机对战中，机器方回合
             this.sleep(500);                   //睡眠一下，防止过快
-            //this.handleMo();                                                       //暂时人机设置只摸牌
             this.doAI();
             this.setData({msg: "己方回合"});      
         }
@@ -127,24 +127,18 @@ Page({
         }
     },
 
-    //处理出牌(暂时设置点击某张牌，就出那张牌)
-    handleChu: function(e) {
+    //处理己方出牌(暂时设置点击某张牌，就出那张牌)
+    handleSelfChu: function(e) {
         let {cardtype} = e.currentTarget.dataset;   //获取出牌的花色的下标
         let pType = "Chu";                          //当前操作类型为 出牌
         //判断是谁的回合
         if(this.data.isMyTurn){
             let pNum = 0;                           //己方回合
             let card = this.data.self.cards[cardtype][0];       //获取对应的卡牌
+            console.log("己方出了！！！" + card)
             this.data.self.cards[cardtype].shift();             //将对应卡牌移出自己的手牌区
             this.handleEat(card, this.data.self, pNum, pType);  //进入吃牌函数判断是否吃牌
         }
-        else{
-            let pNum = 1;                           //对方回合
-            let card = this.data.enemy.cards[cardtype][0];      //获取对应的卡牌
-            this.data.enemy.cards[cardtype].shift();             //将对应卡牌移出自己的手牌区
-            this.handleEat(card, this.data.enemy, pNum, pType); //进入吃牌函数判断是否吃牌
-        }
-
     },
 
     //处理吃牌
@@ -161,9 +155,9 @@ Page({
             }
             this.setPlaceArea("","");               //清空 放置区顶 视图
             this.setPlayerShow(player,pNum);        //刷新 玩家卡牌区 视图
-        }
+        }  
         /* 花色不同 */ 
-        else{                                                                                       
+        else{                                                                                     
             this.addCardToPlaceArea(card);          //没吃牌，那就把牌直接放入放置区
             if(pType == "Chu"){                     //如果是因 出牌操作 而进入到此
                 this.setPlayerShow(player,pNum);    //那么需要 刷新 玩家卡牌区 视图
@@ -171,24 +165,24 @@ Page({
         }
         this.data.thisTurnDone = true;              //本回合结束，触发观察者函数
     },
-     //托管时AI操作
-     doAI: function(){
+
+    //托管时AI操作
+    doAI: function(){
         var enemyCnt = this.data.enemyCnt;
         var selfCnt = this.data.selfCnt;
         var placeArea = this.data.placeArea.cards; 
         var placeTop_card = this.data.placeTop_card;
         //console.log(placeTop_card);
+
         //进行决策
         var num = mcts.Mcts(selfCnt, enemyCnt, placeArea, placeTop_card);
-        //决策出来是0 就调用this.handleMo()
         console.log(num);
-        if (num == 0) {
-            this.handleMo()
+        if (num == 0) {                 //0代表摸牌
+            this.handleMo();
         }
-        else {
-            this.handleAIChu(num-1)
+        else {                          //1，2，3，4分别代表出CDSH的花色
+            this.handleAIChu(num-1);
         }
-        //决出出来是num 就调用this.handleAIChu(num-1)
     },
     
     //处理托管出牌，传入要出的牌的花色
@@ -208,6 +202,7 @@ Page({
             this.handleEat(card, this.data.enemy, pNum, pType); //进入吃牌函数判断是否吃牌
         }
     },
+
     //处理托管
     handleTuo: function() {
         this.setData({
@@ -240,10 +235,15 @@ Page({
 
     //设置 放置区牌顶 显示的内容
     setPlaceArea: function(card,url){
-        this.setData({
-            placeTop_card: card,                //更改放置区顶的牌
-            placeTop_show: url                  //更改放置区顶的牌的图片路径
-        }); 
+        try {
+            this.setData({
+                placeTop_card: card,                //更改放置区顶的牌
+                placeTop_show: url                  //更改放置区顶的牌的图片路径
+            }); 
+        }
+        catch(err) {
+            this.setPlaceArea(card,url);
+        }
     },
 
     //处理每一回合玩家手牌区的显示
@@ -260,10 +260,15 @@ Page({
                 list.push("");
             cnt.push(len);
         }
-        if(pNum === 0)                              //己方玩家
-            this.setData({self_showList: list, selfCnt: cnt});       
-        else                                        //对方玩家
-            this.setData({enemy_showList: list, enemyCnt: cnt});  
+
+        if(pNum === 0) {                            //己方玩家
+            try {this.setData({self_showList: list, selfCnt: cnt});}
+            catch(err) {this.setData({self_showList: list, selfCnt: cnt});}   
+        }   
+        else {                                      //对方玩家
+            try {this.setData({enemy_showList: list, enemyCnt: cnt}); }
+            catch(err) {this.setData({enemy_showList: list, enemyCnt: cnt}); }
+        }          
     },
 
     /* 人人对战和人机对战时的本地牌库随机化 */ 
