@@ -118,20 +118,15 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
       index = 3;
       break;
   }
-  //如果牌库剩余牌不大于手牌，则全部操作为出牌
-  if (sumSelf + sumPlace >= sumLeft) {
-    //获得牌堆中与当前放置区不同的牌的数量
-    //取最大值，这样对手摸牌的话，吃牌概率最大
-    var maxCardCnt = -1, maxIndex = -1;
-    for (var i = 0; i < 4; ++i) {
-        if (leftCard[i] >= maxCardCnt && i != index && selfCnt[i] != 0) {
-          maxCardCnt = leftCard[i];
-          maxIndex = i;
-        }
-    }
-    //出的牌为对应的下标
-    return maxIndex + 1;
+  var maxCardCnt = -1, maxIndex = -1;
+  for (var i = 0; i < 4; ++i) {
+      if (selfCnt[i] > maxCardCnt) {
+        maxCardCnt = selfCnt[i];
+        maxIndex = i;
+      }
   }
+  //出的牌为对应的下标
+  return maxIndex + 1;
   //牌库的牌数量多于手牌，考虑用蒙特卡洛树搜索进行决策
   //对剩余牌库进行随机化排序，使得摸牌操作的后继状态唯一
   var cardList = [];

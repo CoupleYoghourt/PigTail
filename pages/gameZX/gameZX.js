@@ -102,6 +102,12 @@ Page({
     //游戏结束，提示胜方，进行页面跳转
     endGame: function(){
         let token = this.data.token;
+        let uuid = this.data.uuid; 
+
+        if(this.data.isEnemyTurn){
+            this.getFinalInfo(uuid, token);
+        }
+
         let win;                            
         let selfTotal = 0;
         let enemyTotal = 0;
@@ -121,6 +127,34 @@ Page({
                     wx.reLaunch({
                         url: '../roomlist/roomlist?token=' + token
                     })
+                }
+            }
+        })
+    },
+
+    getFinalInfo: function (uuid, token){
+        let that = this;     
+        wx.request({
+            url: 'http://172.17.173.97:9000/api/game/' + uuid ,
+            header: {"Authorization":token},
+            method: "get",
+            success(res) {
+                let info = res.data;
+                let code = info.code;
+                if(code === 200){
+                    let last = info.data.last;
+                    if(last != ""){                       //最后一回合对方操作
+                        let pType = last.split(' ')[1];        //获得对手的操作类型：摸牌还是出牌
+                        let card = last.split(' ')[2];         //获得对手出的手牌
+                        if(pType == "0"){                           //对手操作为 摸牌
+                            that.handleEnemyMo(card);
+                            console.log("对手最后一回合摸了！！！" + card);
+                        }
+                        else{                                       //对手操作为 出牌
+                            that.handleEnemyChu(card);
+                            console.log("对手后一回合出了！！！" + card);
+                        }
+                    }
                 }
             }
         })
@@ -410,15 +444,10 @@ Page({
 
     //设置 放置区牌顶 显示的内容
     setPlaceArea: function(card,url){
-        try {
-            this.setData({
-                placeTop_card: card,                //更改放置区顶的牌
-                placeTop_show: url                  //更改放置区顶的牌的图片路径
-            }); 
-        }
-        catch(err) {
-            this.setPlaceArea(card,url);
-        }
+        this.setData({
+            placeTop_card: card,                //更改放置区顶的牌
+            placeTop_show: url                  //更改放置区顶的牌的图片路径
+        }); 
     },
 
     //处理每一回合玩家手牌区的显示
@@ -437,12 +466,10 @@ Page({
         }
         
         if(pNum === 0) {                            //己方玩家
-            try {this.setData({self_showList: list, selfCnt: cnt});}
-            catch(err) {this.setData({self_showList: list, selfCnt: cnt});}   
+            this.setData({self_showList: list, selfCnt: cnt});
         }   
         else {                                      //对方玩家
-            try {this.setData({enemy_showList: list, enemyCnt: cnt}); }
-            catch(err) {this.setData({enemy_showList: list, enemyCnt: cnt}); }
+            this.setData({enemy_showList: list, enemyCnt: cnt}); 
         }   
     },
 })

@@ -208,15 +208,10 @@ Page({
 
     //设置 放置区牌顶 显示的内容
     setPlaceArea: function(card,url){
-        try {
-            this.setData({
-                placeTop_card: card,                //更改放置区顶的牌
-                placeTop_show: url                  //更改放置区顶的牌的图片路径
-            }); 
-        }
-        catch(err) {
-            this.setPlaceArea(card,url);
-        }
+        this.setData({
+            placeTop_card: card,                //更改放置区顶的牌
+            placeTop_show: url                  //更改放置区顶的牌的图片路径
+        });
     },
 
     //处理每一回合玩家手牌区的显示
@@ -235,12 +230,10 @@ Page({
         }
         
         if(pNum === 0) {                            //己方玩家
-            try {this.setData({self_showList: list, selfCnt: cnt});}
-            catch(err) {this.setData({self_showList: list, selfCnt: cnt});}   
+            this.setData({self_showList: list, selfCnt: cnt});
         }   
         else {                                      //对方玩家
-            try {this.setData({enemy_showList: list, enemyCnt: cnt}); }
-            catch(err) {this.setData({enemy_showList: list, enemyCnt: cnt}); }
+            this.setData({enemy_showList: list, enemyCnt: cnt}); 
         }   
     },
 

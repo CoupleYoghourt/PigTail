@@ -45,6 +45,16 @@ Page({
                 //成功创建对局，获取uuid
                 var uuid = res.data.data.uuid
                 console.log("创建的对局uuid为："+uuid)
+                wx.setClipboardData({         //把uuid复制到剪贴板
+                  data: uuid,
+                  success (res) {
+                    wx.showToast({
+                      title: '对局uuid已复制到剪贴板，快分享给好友吧~',
+                      icon: 'none',
+                      duration: 2000
+                    })     
+                  }
+                })
                 that.setData({
                     createUuid: uuid
                 })
