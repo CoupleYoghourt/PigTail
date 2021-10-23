@@ -67,24 +67,286 @@ function observe(obj, key, watchFun, deep, page) {
   })
 }
 
+
+//随机选择
+function randomPolicy(state) {
+  while (!state.isTerminal()) {
+    let item = state.getPossilbeActions();
+    item.sort(function(){
+      Math.random() - 0.5;
+    });
+    let choice = item[0];
+    let newState = state.tackAction(choice);
+    return newState.getReward();
+  }
+  //console.log("randomPolicy");
+}
+
+
+function deepClone(obj) {
+  let _obj = JSON.stringify(obj),
+  objClone = JSON.parse(_obj);
+  return objClone;
+}
+
+class State {
+  //初始化局面
+  constructor(selfCnt, enemyCnt, placeAreaCnt, placeTop, Deck) {
+    this.selfCnt = deepClone(selfCnt);
+    this.enemyCnt = deepClone(enemyCnt);
+    this.placeAreaCnt = deepClone(placeAreaCnt);
+    this.placeTop = deepClone(placeTop);
+    this.Deck = deepClone(Deck);
+    this.currentPlayer = 1;
+  }
+  //当前的玩家
+  getCurrentPlayer() {
+    return this.currentPlayer;
+  }
+  //允许的操作集合
+  getPossilbeActions() {
+    let possilbeActions = [0];
+    for (let i = 0; i < 4; ++i) {
+      if (this.selfCnt[i] != 0) {
+        possilbeActions.push(i+1);
+      }
+    }
+    return possilbeActions;
+  }
+  //进行操作后到达的局面
+  tackAction(action) {
+    let newSate = new State(this.selfCnt, this.enemyCnt, this.placeAreaCnt, this.placeTop, this.Deck);
+    newSate.currentPlayer *= -1;
+    if (action == 0) {
+      let index = newSate.Deck.pop();
+      newSate.placeAreaCnt[index]++;
+      if (index == newSate.placeTop) {
+        for (let i = 0; i < 4; ++i) {
+          newSate.selfCnt[i] += newSate.placeAreaCnt[i];
+          newSate.placeAreaCnt[i] = 0;
+        }
+        newSate.placeTop = -1;
+      }
+      else {
+        newSate.placeTop = index;
+      }
+    }
+    else {
+      let index = action - 1;
+      newSate.selfCnt[index]--;
+      newSate.placeAreaCnt[index]++;
+      if(newSate.placeTop == index) {
+        for (let i = 0; i < 4; ++i) {
+          newSate.selfCnt[i] += newSate.placeAreaCnt[i];
+          newSate.placeAreaCnt[i] = 0;
+        }
+        newSate.placeTop = -1;
+      }
+      else {
+        newSate.placeTop = index;
+      }
+    }
+     for (let i = 0; i < 4; ++i) {
+       let tmp = newSate.selfCnt[i];
+       newSate.selfCnt[i] = newSate.enemyCnt[i];
+       newSate.enemyCnt[i] = tmp;
+     }
+    //console.log("takeAction");
+    return newSate;
+  }
+  //游戏是否结束
+  isTerminal() {
+    if (this.Deck.length == 0)
+      return true;
+    else
+      return false;
+  }
+  //奖励分数计算
+  getReward() {
+    let s1 = 0, s2 = 0;
+    for (let i = 0; i < 4; ++i) {
+      s1 += this.selfCnt[i];
+      s2 += this.enemyCnt[i];
+    }
+    if (s1 > s2)
+      return 1;
+    else
+      return 0;
+  }
+}
+
+//定义树节点
+class treeNode {
+  constructor (state, parent) {
+    this.state = new State(state.selfCnt, state.enemyCnt, state.placeAreaCnt, state.placeTop, state.Deck);
+    this.isTerminal = state.isTerminal();
+    this.parent = parent;
+    this.isFullyExpanded = this.isTerminal;
+    this.numVisits = 1.0;
+    this.totalReward = 0.0;
+    this.children = {};
+  }
+}
+
+//定义搜索算法
+class MCTS {
+  constructor (timeLimit, iterationLimit, explorationConstant=1 / Math.sqrt(2), rolloutPolicy=randomPolicy) {
+    //console.log(timeLimit);
+    if (timeLimit === undefined) {
+      this.searchLimit = iterationLimit;
+      this.limitType = "iterations";
+    }
+    else {
+      this.timeLimit = timeLimit;
+      this.limitType = "time";
+    }
+    //console.log(this.limitType);
+    this.explorationConstant = explorationConstant;
+    this.rollout = rolloutPolicy;
+  }
+  //抉择出较优的一步
+  search(initialState, needDetails=false) {
+    this.root = new treeNode(initialState);
+    //基于时间或者迭代次数设置
+    if (this.limitType == "time") {
+      //console.log("AAAA");
+      let time = new Date();
+      let timeLimit = time.getTime() + this.timeLimit / 1000;
+      while (time.getTime() < timeLimit) {
+        //console.log(time.getTime());
+        this.executeRound();
+      }
+    }
+    else {
+      //console.log("SSSS");
+      for (var i = 0; i < this.searchLimit; ++i) {
+        this.executeRound();
+      }
+    }
+    //结束搜索，返回最优节点
+    let bestChild = this.getBestChild(this.root, 0);
+    //console.log("endsearch");
+    for (let action in this.root.children) {
+      let node = this.root.children[action];
+      if (node == bestChild) {
+        return action;
+      }
+    }
+    return 0;
+  }
+
+  executeRound() {
+    //console.log("executeRound");
+    let node = this.selectNode(this.root);
+    let reward = this.rollout(node.state);
+    this.backpropogate(node, reward);
+  }
+
+  selectNode(node) {
+    //console.log("selectNode");
+    while (node.isTerminal == false) {
+      if (node.isFullyExpanded) {
+        node = this.getBestChild(node, this.explorationConstant);
+        //console.log("now is selecting");
+        //console.log(node);
+      }
+      else {
+        return this.expand(node);
+      }
+    }
+    return node;
+  }
+
+  expand(node) {
+    //console.log("expand");
+    let actions = node.state.getPossilbeActions();
+    //console.log(actions);
+    //console.log(node.children);
+    for (let action of actions) {
+      if (!(action in node.children)) {
+        let newNode = new treeNode(node.state.tackAction(action), node);
+        node.children[action] = newNode;
+        //console.log(Object.getOwnPropertyNames(node.children).length);
+        if (actions.length == Object.getOwnPropertyNames(node.children).length) {
+          node.isFullyExpanded = true;
+        }
+        return newNode;
+      }
+    }
+    //console.log(node);
+  }
+  //上传遍历次数以及奖励分数
+  backpropogate(node, reward) {
+    //console.log("backpropogate");
+    while (node) {
+      node.numVisits += 1;
+      node.totalReward += reward;
+      // if (node.totalReward > 100000)
+      //   node.totalReward = 100000;
+      // if (node.totalReward < -100000)
+      //   node.totalReward = -100000;
+      node = node.parent;
+    }
+  }
+
+  getBestChild(node, explorationValue) {
+    //console.log("getBestChild");
+    let bestValue = -Infinity;
+    let bestNodes = [];
+    for (let index in node.children) {
+      let child = node.children[index];
+      let nodeValue = node.state.getCurrentPlayer() * child.totalReward / child.numVisits + explorationValue * Math.sqrt(2 * Math.log(node.numVisits) / child.numVisits);
+      if (nodeValue > bestValue) {
+        bestValue = nodeValue;
+        bestNodes = [child];
+      }
+      else if (nodeValue == bestValue) {
+        bestNodes.push(child);
+      }
+    }
+    if (bestNodes.length == 0) {
+      // console.log(node);
+      // console.log(node.children);
+      // for (let index in node.children) {
+      //   let child = node.children[index];
+      //   let nodeValue = node.state.getCurrentPlayer() * child.totalReward / child.numVisits + explorationValue * Math.sqrt(2 * Math.log(node.numVisits) / child.numVisits);
+      //   console.log(nodeValue);
+      //   console.log(child.totalReward);
+      //   console.log(child.numVisits);
+      //   console.log(Math.log(node.numVisits));
+      // }
+      for (let index in node.children) {
+        let child = node.children[index];
+          bestNodes.push(child);
+      }
+    }
+    bestNodes.sort(function(){
+      return Math.random() - 0.5;
+    });
+    return bestNodes[0];
+  }
+}
+
+
+
 //抉择函数，选择最优的操作
 //对手手牌状态，己方手牌状态，放置区手牌状态, 放置区牌顶
 //顺序CDSH
 //返回一个值0 摸牌， 1，2，3，4分别表示CDSH
 function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
   let placeAreaCnt = [0,0,0,0];
-  for (var i = 0; i < 4; ++i) {
+  for (let i = 0; i < 4; ++i) {
     placeAreaCnt[i] = placeArea[i].length;
   }
   //统计牌库的状态
   let leftCard = [13,13,13,13];
-  for (var i = 0; i < 4; ++i) {
+  for (let i = 0; i < 4; ++i) {
     leftCard[i] -= enemyCnt[i];
     leftCard[i] -= selfCnt[i];
     leftCard[i] -= placeAreaCnt[i];
   }
-  var sumSelf = 0, sumLeft = 0, sumPlace = 0, sumEney = 0;
-  for (var i = 0; i < 4; ++i) {
+  let sumSelf = 0, sumLeft = 0, sumPlace = 0, sumEney = 0;
+  for (let i = 0; i < 4; ++i) {
     sumSelf += selfCnt[i];
     sumLeft += leftCard[i];
     sumPlace += placeAreaCnt[i];
@@ -103,7 +365,7 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
     return 0;
   }
   //放置区顶牌对应的下标
-  var index = -1;
+  let index = -1;
   switch(placeTop_card[0]) {
     case 'C':
       index = 0;
@@ -118,39 +380,43 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
       index = 3;
       break;
   }
-  var maxCardCnt = -1, maxIndex = -1;
-  for (var i = 0; i < 4; ++i) {
-      if (selfCnt[i] > maxCardCnt) {
-        maxCardCnt = selfCnt[i];
-        maxIndex = i;
-      }
-  }
-  //出的牌为对应的下标
-  return maxIndex + 1;
+  
   //牌库的牌数量多于手牌，考虑用蒙特卡洛树搜索进行决策
   //对剩余牌库进行随机化排序，使得摸牌操作的后继状态唯一
-  var cardList = [];
-  for (var i = 0; i < 4; ++i) {
-    var tmp = leftCard[i];
+  let cardList = [];
+  for (let i = 0; i < 4; ++i) {
+    let tmp = leftCard[i];
     while(tmp) {
       tmp--;
       cardList.push(i);
     }
   }
-  cardList.sort(function(){
-    return Math.random() - 0.5;
-  });
-  //进行抉择
-  var possilbeSelect = [0];
-  for (var i = 0; i < 4; ++i) {
-    if (selfCnt[i] != 0)
-      possilbeSelect.push(i+1);
+  let ansCnt = [0,0,0,0,0];
+  
+  for (let i = 0; i < 100; ++i) {
+    cardList.sort(function(){
+      return Math.random() - 0.5;
+    });
+    let Game = new State(selfCnt, enemyCnt, placeAreaCnt, index, cardList);
+    let searcher = new MCTS(undefined, 1000,);
+    let action = searcher.search(Game);
+    ansCnt[action]++;
   }
-  possilbeSelect.sort(function(){
-    return Math.random() - 0.5;
-  });
-  console.log(possilbeSelect);
-  return possilbeSelect[0];
+  let maxCnt = -1, act = -1;
+  for (let i = 0; i <= 4; ++i) {
+    if (maxCnt < ansCnt[i]) {
+      maxCnt = ansCnt[i];
+      act = i;
+    }
+  }
+  if (act == 0) {
+    return 0;
+  }
+  if (selfCnt[act - 1] == 0) {
+    act = 0;
+  }
+  console.log(act);
+  return act;
 }
 
 module.exports = {
