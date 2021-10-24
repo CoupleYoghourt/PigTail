@@ -1,7 +1,5 @@
 // pages/gameRJ/gameRJ.js
 
-//记得try catch一下图片渲染的地方，否则有可能会渲染错误
-//写一个渲染图片的函数，try渲染函数 如果有错误就catch这个函数自己（递归），重新渲染
 const watch = require("../../utils/util.js");               //导入观察者
 const mcts = require("../../utils/util.js");                //导入决策函数
 
@@ -471,5 +469,13 @@ Page({
         else {                                      //对方玩家
             this.setData({enemy_showList: list, enemyCnt: cnt}); 
         }   
+    },
+
+    onHide: function () {
+        clearInterval(this.data.interval);
+    },
+
+    onUnload: function () {
+        clearInterval(this.data.interval);
     },
 })
