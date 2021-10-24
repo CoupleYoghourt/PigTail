@@ -1,7 +1,7 @@
 # PigTail 猪尾巴游戏
 
 <a href="https://github.com/CoupleYoghourt">
-  <img src="https://badgen.net/badge/Author/bngel/blue?icon=telegram"/></a>
+  <img src="https://badgen.net/badge/Author/ZhengHaobin/blue?icon=telegram"/></a>
 <a href="https://github.com/CoupleYoghourt/PigTail">  <img src="https://badgen.net/badge/PigTail/public/black?icon=github"/></a>
 <a>
   <img src="https://badgen.net/badge/Language/JavaScript/pink?icon=eclipse"/>
