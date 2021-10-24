@@ -8,7 +8,7 @@
 
 # 具体的issue格式
 
-## **Describe the bug**描述你遇到的问题
+## **Describe the bug** 描述你遇到的问题
 
 请尽可能简洁明了地说明问题
 
