@@ -77,8 +77,9 @@ function randomPolicy(state) {
     });
     let choice = item[0];
     let newState = state.tackAction(choice);
-    return newState.getReward();
+    state = new State(newState.selfCnt, newState.enemyCnt, newState.placeAreaCnt, newState.placeTop, newState.Deck);
   }
+  return state.getReward();
   //console.log("randomPolicy");
 }
 
@@ -107,22 +108,38 @@ class State {
   getPossilbeActions() {
     let possilbeActions = [0];
     for (let i = 0; i < 4; ++i) {
-      if (this.selfCnt[i] != 0) {
-        possilbeActions.push(i+1);
+      //如果是己方
+      if (this.currentPlayer == 1) {
+        if (this.selfCnt[i] != 0) {
+          possilbeActions.push(i+1);
+        }
+      }
+      // 如果是对方
+      else {
+        if (this.enemyCnt[i] != 0) {
+          possilbeActions.push(i+1);
+        }
       }
     }
     return possilbeActions;
   }
   //进行操作后到达的局面
   tackAction(action) {
+    //拷贝当前局面
     let newSate = new State(this.selfCnt, this.enemyCnt, this.placeAreaCnt, this.placeTop, this.Deck);
-    newSate.currentPlayer *= -1;
     if (action == 0) {
       let index = newSate.Deck.pop();
       newSate.placeAreaCnt[index]++;
+      //进行吃牌判断
       if (index == newSate.placeTop) {
         for (let i = 0; i < 4; ++i) {
-          newSate.selfCnt[i] += newSate.placeAreaCnt[i];
+          //判断归属
+          if (newSate.currentPlayer == 1) {
+            newSate.selfCnt[i] += newSate.placeAreaCnt[i];
+          }
+          else {
+            newSate.enemyCnt[i] += newSate.placeAreaCnt[i];
+          }
           newSate.placeAreaCnt[i] = 0;
         }
         newSate.placeTop = -1;
@@ -133,11 +150,24 @@ class State {
     }
     else {
       let index = action - 1;
-      newSate.selfCnt[index]--;
+      //出牌，判断是谁的回合，对应的手牌减少！
+      if (newSate.currentPlayer == 1) {
+        newSate.selfCnt[index]--;
+      }
+      else {
+        newSate.enemyCnt[index]--;
+      }
       newSate.placeAreaCnt[index]++;
+      //吃牌判断
       if(newSate.placeTop == index) {
         for (let i = 0; i < 4; ++i) {
-          newSate.selfCnt[i] += newSate.placeAreaCnt[i];
+          //判断归属
+          if (newSate.currentPlayer == 1) {
+            newSate.selfCnt[i] += newSate.placeAreaCnt[i];
+          }
+          else {
+            newSate.enemyCnt[i] += newSate.placeAreaCnt[i];
+          }
           newSate.placeAreaCnt[i] = 0;
         }
         newSate.placeTop = -1;
@@ -146,11 +176,7 @@ class State {
         newSate.placeTop = index;
       }
     }
-     for (let i = 0; i < 4; ++i) {
-       let tmp = newSate.selfCnt[i];
-       newSate.selfCnt[i] = newSate.enemyCnt[i];
-       newSate.enemyCnt[i] = tmp;
-     }
+    newSate.currentPlayer *= -1;
     //console.log("takeAction");
     return newSate;
   }
@@ -168,10 +194,7 @@ class State {
       s1 += this.selfCnt[i];
       s2 += this.enemyCnt[i];
     }
-    if (s1 > s2)
-      return 1;
-    else
-      return 0;
+    return s1 > s2 ? 1 : 0;
   }
 }
 
@@ -190,7 +213,7 @@ class treeNode {
 
 //定义搜索算法
 class MCTS {
-  constructor (timeLimit, iterationLimit, explorationConstant=1 / Math.sqrt(2), rolloutPolicy=randomPolicy) {
+  constructor (timeLimit, iterationLimit, explorationConstant=1.0 / Math.sqrt(2), rolloutPolicy=randomPolicy) {
     //console.log(timeLimit);
     if (timeLimit === undefined) {
       this.searchLimit = iterationLimit;
@@ -219,7 +242,7 @@ class MCTS {
     }
     else {
       //console.log("SSSS");
-      for (var i = 0; i < this.searchLimit; ++i) {
+      for (let i = 0; i < this.searchLimit; ++i) {
         this.executeRound();
       }
     }
@@ -228,7 +251,7 @@ class MCTS {
     //console.log("endsearch");
     for (let action in this.root.children) {
       let node = this.root.children[action];
-      if (node == bestChild) {
+      if (node === bestChild) {
         return action;
       }
     }
@@ -239,6 +262,9 @@ class MCTS {
     //console.log("executeRound");
     let node = this.selectNode(this.root);
     let reward = this.rollout(node.state);
+    if (reward === undefined) {
+      console.log(node);
+    }
     this.backpropogate(node, reward);
   }
 
@@ -295,7 +321,7 @@ class MCTS {
     let bestNodes = [];
     for (let index in node.children) {
       let child = node.children[index];
-      let nodeValue = node.state.getCurrentPlayer() * child.totalReward / child.numVisits + explorationValue * Math.sqrt(2 * Math.log(node.numVisits) / child.numVisits);
+      let nodeValue = child.totalReward / child.numVisits + explorationValue * Math.sqrt(2 * Math.log(node.numVisits) / child.numVisits);
       if (nodeValue > bestValue) {
         bestValue = nodeValue;
         bestNodes = [child];
@@ -305,16 +331,6 @@ class MCTS {
       }
     }
     if (bestNodes.length == 0) {
-      // console.log(node);
-      // console.log(node.children);
-      // for (let index in node.children) {
-      //   let child = node.children[index];
-      //   let nodeValue = node.state.getCurrentPlayer() * child.totalReward / child.numVisits + explorationValue * Math.sqrt(2 * Math.log(node.numVisits) / child.numVisits);
-      //   console.log(nodeValue);
-      //   console.log(child.totalReward);
-      //   console.log(child.numVisits);
-      //   console.log(Math.log(node.numVisits));
-      // }
       for (let index in node.children) {
         let child = node.children[index];
           bestNodes.push(child);
@@ -353,15 +369,7 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
     sumEney += enemyCnt[i];
   }
   //如果没有手牌，那么只能摸牌
-  if (sumLeft == 0) {
-    return 0;
-  }
-  //摸爆了
-  if (sumSelf + sumEney + sumPlace >= 78) {
-    return 0;
-  }
-  //怎么摸牌都少就一直摸
-  if (sumSelf + sumPlace < 5 || sumSelf + sumSelf + 1 < sumEney) {
+  if (sumSelf == 0) {
     return 0;
   }
   //放置区顶牌对应的下标
@@ -393,15 +401,16 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
   }
   let ansCnt = [0,0,0,0,0];
   
-  for (let i = 0; i < 100; ++i) {
+  for (let i = 0; i < 200; ++i) {
     cardList.sort(function(){
       return Math.random() - 0.5;
     });
     let Game = new State(selfCnt, enemyCnt, placeAreaCnt, index, cardList);
-    let searcher = new MCTS(undefined, 1000,);
+    let searcher = new MCTS(undefined, 100,);
     let action = searcher.search(Game);
     ansCnt[action]++;
   }
+  console.log(ansCnt);
   let maxCnt = -1, act = -1;
   for (let i = 0; i <= 4; ++i) {
     if (maxCnt < ansCnt[i]) {
