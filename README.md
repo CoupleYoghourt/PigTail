@@ -1,7 +1,7 @@
 # PigTail 猪尾巴游戏
 
 <a href="https://github.com/CoupleYoghourt">
-  <img src="https://badgen.net/badge/Author/ZhengHaobin/blue?icon=telegram"/></a>
+  <img src="https://badgen.net/badge/Author/CoupleYoghourt/blue?icon=telegram"/></a>
 <a href="https://github.com/CoupleYoghourt/PigTail">  <img src="https://badgen.net/badge/PigTail/public/black?icon=github"/></a>
 <a>
   <img src="https://badgen.net/badge/Language/JavaScript/pink?icon=eclipse"/>
@@ -31,7 +31,7 @@
 
 - 在试玩前请先阅读<a href="https://edu.cnblogs.com/campus/fzu/FZU_SE_K/homework/12286">猪尾巴游戏规则</a>
 
-- **在线对战**模式 **有设置托管**，人人对战、人机对战没有设置托管
+- **在线对战** 模式 **有设置托管**，人人对战、人机对战没有设置托管
 
 - 如需要从卡组中 **摸牌**，点击 摸牌 按键即可
 
