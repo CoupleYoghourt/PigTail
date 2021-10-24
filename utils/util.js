@@ -194,7 +194,7 @@ class State {
       s1 += this.selfCnt[i];
       s2 += this.enemyCnt[i];
     }
-    return s1 > s2 ? 1 : 0;
+    return s1 < s2 ? 1 : 0;
   }
 }
 
@@ -321,7 +321,7 @@ class MCTS {
     let bestNodes = [];
     for (let index in node.children) {
       let child = node.children[index];
-      let nodeValue = child.totalReward / child.numVisits + explorationValue * Math.sqrt(2 * Math.log(node.numVisits) / child.numVisits);
+      let nodeValue = node.state.getCurrentPlayer() * child.totalReward / child.numVisits + explorationValue * Math.sqrt(2 * Math.log(node.numVisits) / child.numVisits);
       if (nodeValue > bestValue) {
         bestValue = nodeValue;
         bestNodes = [child];
@@ -344,6 +344,70 @@ class MCTS {
 }
 
 
+function Mo(enemyCnt, selfCnt, placeArea, placeTop_card) {
+  let placeAreaCnt = [0,0,0,0];
+  for (let i = 0; i < 4; ++i) {
+    placeAreaCnt[i] = placeArea[i].length;
+  }
+  let cardLeft = [13,13,13,13];
+  let whichLeft = -1;
+  let sumSelf = 0, sumLeft = 52, sumEney = 0, sumPlace = 0;
+  for (let i = 0; i < 4; ++i) {
+    sumSelf += selfCnt[i];
+    sumEney += enemyCnt[i];
+    sumPlace += placeAreaCnt[i];
+    cardLeft[i] -= selfCnt[i] + enemyCnt[i] + placeAreaCnt[i];
+    if (cardLeft[i] != 0) {
+      whichLeft = i;
+    }
+    sumLeft -= selfCnt[i] + enemyCnt[i] + placeAreaCnt[i];
+  }
+  if (sumSelf == 0) {
+    return 0;
+  }
+  if (sumLeft == 1) {
+    if (sumLeft + sumSelf + sumPlace < sumEney)
+      return 0;
+    if (whichLeft != placeTop_card || placeTop_card == -1)
+      return 0;
+    let id = -1, mx = -1;
+    for (let i = 0; i < 4; ++i) {
+      if (placeTop_card != i && mx < selfCnt[i] && selfCnt[i] > 0) {
+        mx = selfCnt[i];
+        id = i;
+      }
+    }
+    return id + 1;
+  }
+  if (sumSelf + 2 * sumEney + sumPlace >= 78) 
+    return 0;
+  if (sumSelf + sumPlace <= 5)
+    return 0;
+  if (sumSelf + 1 + sumPlace <= sumEney)
+    return 0;
+  if (sumSelf > 5) {
+    let id = -1, mx = -1;
+    for (let i = 0; i < 4; ++i) {
+      if (placeTop_card != i && mx < selfCnt[i] && selfCnt[i] > 0) {
+        mx = selfCnt[i];
+        id = i;
+      }
+    }
+    return id + 1;
+  }
+  if (sumPlace > 5) {
+    let id = -1, mx = -1;
+    for (let i = 0; i < 4; ++i) {
+      if (placeTop_card != i && mx < selfCnt[i] && selfCnt[i] > 0) {
+        mx = selfCnt[i];
+        id = i;
+      }
+    }
+    return id + 1;
+  }
+
+  return 0;
+}
 
 //抉择函数，选择最优的操作
 //对手手牌状态，己方手牌状态，放置区手牌状态, 放置区牌顶
@@ -388,7 +452,7 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
       index = 3;
       break;
   }
-  
+  //return Mo(enemyCnt, selfCnt, placeArea, index);
   //牌库的牌数量多于手牌，考虑用蒙特卡洛树搜索进行决策
   //对剩余牌库进行随机化排序，使得摸牌操作的后继状态唯一
   let cardList = [];
@@ -401,30 +465,33 @@ function Mcts(enemyCnt, selfCnt, placeArea, placeTop_card) {
   }
   let ansCnt = [0,0,0,0,0];
   
-  for (let i = 0; i < 200; ++i) {
+  for (let i = 0; i < 100; ++i) {
     cardList.sort(function(){
       return Math.random() - 0.5;
     });
     let Game = new State(selfCnt, enemyCnt, placeAreaCnt, index, cardList);
-    let searcher = new MCTS(undefined, 100,);
+    let searcher = new MCTS(undefined, 200,);
     let action = searcher.search(Game);
     ansCnt[action]++;
   }
+  let act = -1, mxCnt = -100;
   console.log(ansCnt);
-  let maxCnt = -1, act = -1;
-  for (let i = 0; i <= 4; ++i) {
-    if (maxCnt < ansCnt[i]) {
-      maxCnt = ansCnt[i];
+   if (selfCnt[0] >= 6 || selfCnt[1] >= 6 || selfCnt[2] >= 6 || selfCnt[3] >= 6 || sumSelf >= 15)
+     ansCnt[0] -= 70;
+   if (index != -1 && sumSelf + sumPlace + sumLeft >= sumEney) {
+     ansCnt[index+1] -= 60;
+   }
+   for (let i = 0; i < 4; ++i) {
+     if (selfCnt[i] == 1)
+       ansCnt[i+1] -= 20;
+   }
+  for (let i = 0; i < 5; ++i) {
+    if (mxCnt < ansCnt[i]) {
       act = i;
-    }
+      mxCnt = ansCnt[i];
+    } 
   }
-  if (act == 0) {
-    return 0;
-  }
-  if (selfCnt[act - 1] == 0) {
-    act = 0;
-  }
-  console.log(act);
+  console.log(ansCnt);
   return act;
 }
 
